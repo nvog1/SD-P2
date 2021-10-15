@@ -4,4 +4,4 @@
 *.json
 *.cache
 *.user
-*.BBDD
+*BBDD.*
