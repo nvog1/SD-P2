@@ -51,15 +51,19 @@ public class HiloServidorRegistro extends Thread {
         int result = 0;
 
         if (operacion.length == 4) {
-            System.out.println("SRV: Alias/ID: " + operacion[1] + "; Nombre: " + operacion[2] + 
+            System.out.println("SRV: se va a " + operacion[0] + "un perfil con los siguientes datos" +
+            " Alias/ID: " + operacion[1] + "; Nombre: " + operacion[2] + 
             "; Contraseña: " + operacion[3]);
             
             //-------------------------------//
             // Conexion con la base de datos //
+            //    mediante capas EN y CAD    // 
             //-------------------------------//
+
 
             result = 1;
         }
+        // Comprobar si hace falta poner aqui las operaciones de entrada y salida del parque
         else {
             System.out.println("No se han proporcionado los campos necesarios");
             result = -1;

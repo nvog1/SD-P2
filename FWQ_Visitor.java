@@ -51,7 +51,7 @@ public class FWQ_Visitor {
 			" Contraseña: pw" + ALIAS);
 		p_Cadena = p_operacion + ";" + ALIAS + 
 			";nombre" + ALIAS + ";pw" + ALIAS;
-			ALIAS++;
+		ALIAS++;
 		escribeSocket(p_Socket_Con_Servidor, p_Cadena);
 		p_Cadena = "";
 		p_Cadena = leeSocket(p_Socket_Con_Servidor, p_Cadena);
