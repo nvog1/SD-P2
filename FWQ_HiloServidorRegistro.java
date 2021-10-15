@@ -1,6 +1,7 @@
 import java.lang.Exception;
 import java.net.Socket;
 import java.io.*;
+import java.sql.*;
 
 public class HiloServidorRegistro extends Thread {
     /* TODO
@@ -43,6 +44,14 @@ public class HiloServidorRegistro extends Thread {
 		return;
 	}
 
+    // Conexion con la Base de datos
+    // URL de Conexion
+    String connectionURL = "";
+    // Conectar con la base de datos
+    public boolean consultaSQL(){
+
+    }
+
     public int realizarRegistro(String cadena) {
         // El caracter de separacion sera el punto y coma ';'
         // Se guardara Alias/ID, Nombre y contraseña
@@ -59,6 +68,8 @@ public class HiloServidorRegistro extends Thread {
             // Conexion con la base de datos //
             //    mediante capas EN y CAD    // 
             //-------------------------------//
+            // Pagina que explica como conectar y hacer consultas:
+            //   https://docs.microsoft.com/es-es/sql/connect/jdbc/step-3-proof-of-concept-connecting-to-sql-using-java?view=sql-server-ver15
 
 
             result = 1;
