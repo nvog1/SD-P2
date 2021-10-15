@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "BBDD", "BBDD\BBDD.sqlproj", "{DC87E254-3785-47B5-A211-6C52D6E557DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{88AC136E-5FC1-4468-AD0E-89802DF61409}"
+	ProjectSection(SolutionItems) = preProject
+		..\repo\.gitignore = ..\repo\.gitignore
+		..\repo\FWQ_Engine.java = ..\repo\FWQ_Engine.java
+		..\repo\FWQ_HiloServidorRegistro.java = ..\repo\FWQ_HiloServidorRegistro.java
+		..\repo\FWQ_Registry.java = ..\repo\FWQ_Registry.java
+		..\repo\FWQ_Sensor.java = ..\repo\FWQ_Sensor.java
+		..\repo\FWQ_Visitor.java = ..\repo\FWQ_Visitor.java
+		..\repo\FWQ_WaitingTimeServer.java = ..\repo\FWQ_WaitingTimeServer.java
+		..\repo\README.md = ..\repo\README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC87E254-3785-47B5-A211-6C52D6E557DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC87E254-3785-47B5-A211-6C52D6E557DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC87E254-3785-47B5-A211-6C52D6E557DB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{DC87E254-3785-47B5-A211-6C52D6E557DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC87E254-3785-47B5-A211-6C52D6E557DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC87E254-3785-47B5-A211-6C52D6E557DB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DA4162E8-EA9F-4623-83A1-06A7C2F21948}
+	EndGlobalSection
+EndGlobal
