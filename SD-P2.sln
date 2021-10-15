@@ -7,14 +7,14 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "BBDD", "BBDD\BBDD.sqlproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{88AC136E-5FC1-4468-AD0E-89802DF61409}"
 	ProjectSection(SolutionItems) = preProject
-		..\repo\.gitignore = ..\repo\.gitignore
-		..\repo\FWQ_Engine.java = ..\repo\FWQ_Engine.java
-		..\repo\FWQ_HiloServidorRegistro.java = ..\repo\FWQ_HiloServidorRegistro.java
-		..\repo\FWQ_Registry.java = ..\repo\FWQ_Registry.java
-		..\repo\FWQ_Sensor.java = ..\repo\FWQ_Sensor.java
-		..\repo\FWQ_Visitor.java = ..\repo\FWQ_Visitor.java
-		..\repo\FWQ_WaitingTimeServer.java = ..\repo\FWQ_WaitingTimeServer.java
-		..\repo\README.md = ..\repo\README.md
+		.gitignore = .gitignore
+		FWQ_Engine.java = FWQ_Engine.java
+		FWQ_HiloServidorRegistro.java = FWQ_HiloServidorRegistro.java
+		FWQ_Registry.java = FWQ_Registry.java
+		FWQ_Sensor.java = FWQ_Sensor.java
+		FWQ_Visitor.java = FWQ_Visitor.java
+		FWQ_WaitingTimeServer.java = FWQ_WaitingTimeServer.java
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
