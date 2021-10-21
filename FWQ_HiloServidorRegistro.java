@@ -46,10 +46,21 @@ public class HiloServidorRegistro extends Thread {
 
     // Conexion con la Base de datos
     // URL de Conexion
-    String connectionURL = "";
+    String connectionURL = "jdbc:sqlserver://SERVER,database.windows.net:1433;" +
+        "database=BBDD;" + 
+        "user=USERNAME@SERVER;" + 
+        "password=PASSWORD;" +
+        "encrypt=true;" + 
+        "trusServerCertificate=false;" + 
+        "loginTimeout=30;";
     // Conectar con la base de datos
     public boolean consultaSQL(){
-
+        try (Connection connection = DriverManager.getConnection(connectionURL)) {
+            
+        }
+        catch (SQLExcepion e) {
+            System.out.println("Error: " + e.toString());
+        }
     }
 
     public int realizarRegistro(String cadena) {
