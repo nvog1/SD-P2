@@ -50,7 +50,7 @@ public class HiloServidorRegistro extends Thread {
     String user = "root";
     String password = "1234";*/
 
-    // Realizar una consukta a la base de datos
+    // Realizar una consulta a la base de datos
     public boolean consultaSQL(){
         String connectionURL = "jdbc:mysql://localhost:3306/NOMBRE_BD";
         String user = "root";

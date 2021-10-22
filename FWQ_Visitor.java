@@ -64,6 +64,24 @@ public class FWQ_Visitor {
 		// Problema: tener en cuenta cual era el alias anterior para mantenerlo
 	}
 
+	public String entrarParque() {
+		Properties kafkaProps = new Propoerties();
+		
+		kafkaProps.put("bootstrap.servers", "broker1:9092,broker2:9092");
+		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer," +
+			"org.apache.kafka.common.serialization.IntegerSerializer"); 
+		kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer," +
+			"org.apache.kafka.common.serialization.IntegerSerializer");
+
+		producer = new KafkaProducer<String, Integer>(kafkaProps);
+		// Se enviara asincronamente con send()
+
+	}
+
+	public String salirParque() {
+
+	}
+
 	// El visitante podra registrarse, modificar sus datos, entrar al parque, salir del parque...
 	public void pedirOperacion(String p_registryHost, String p_registryPort, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		int operacion, salir = 0;
@@ -106,12 +124,12 @@ public class FWQ_Visitor {
 					case 3: 
 						// Se quiere entrar al parque
 						op = "entrar";
-						//entrarParque(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort);
+						//entrarParque();
 					break;
 					case 4:
 						// Se quiere salir del parque
 						op = "salir";
-						//salirParque(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort);
+						//salirParque();
 					break;
 				}
 				if (operacion == 0 || operacion == 1) {
