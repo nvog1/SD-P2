@@ -19,17 +19,8 @@ public class FWQ_WaitingTimeServer {
 				System.exit(1);
 			}
 			puerto = args[0];
-			ServerSocket ss = new ServerSocket(Integer.parseInt(puerto));
-			System.out.println("Escucho el puerto " + puerto);
-
-			for(;;)
-			{
-				Socket cs = ss.accept();
-				System.out.println("Sirviendo al motor...");
-
-				Thread t = new WTSHilo(cs);
-				t.start();
-			}
+			Thread t = new WTSHilo(puerto);
+			
 		}
 		catch(Exception e)
 		{
