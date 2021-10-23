@@ -51,8 +51,10 @@ public class WTSHilo {
 		{
 			Socket cs = ss.accept();
 			System.out.println("Sirviendo al motor...");
-			cs.close();
+
 			//lógica de servir al engine. (leer fichero con info, enviar datos)
+
+			cs.close();
 		}
 		
 		
