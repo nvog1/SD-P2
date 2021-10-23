@@ -2,6 +2,9 @@ import java.net.*;
 
 public class FWQ_WaitingTimeServer {
 
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 
 		//parte de kafka
@@ -14,8 +17,8 @@ public class FWQ_WaitingTimeServer {
 		
 		try
 		{
-			if (args.length < 2) {
-				System.out.println("Indica el puerto de escucha y la ip y puerto del broker(puerto puerto:ip)");
+			if (args.length < 3) {
+				System.out.println("Indica el puerto de escucha y la ip y puerto del broker(puerto puerto_broker ip_broker)");
 				System.exit(1);
 			}
 			puerto = args[0];
