@@ -3,7 +3,7 @@ import java.net.Socket;
 import java.io.*;
 import java.sql.*;
 
-public class HiloServidorRegistro extends Thread {
+public class FWQ_HiloServidorRegistro extends Thread {
     /* TODO
     / Campos implementables:
     /  · Registro de clientes con nombre, coordenadas actuales y destino
@@ -11,7 +11,7 @@ public class HiloServidorRegistro extends Thread {
 
     private Socket skCliente;
 
-    public HiloServidorRegistro(Socket p_Cliente) {
+    public FWQ_HiloServidorRegistro(Socket p_Cliente) {
         this.skCliente = p_Cliente; 
     }
 
@@ -51,16 +51,18 @@ public class HiloServidorRegistro extends Thread {
     String password = "1234";*/
 
     // Realizar una consulta a la base de datos
-    public boolean consultaSQL(){
+    public boolean consultaSQL() {
         String connectionURL = "jdbc:mysql://localhost:3306/NOMBRE_BD";
         String user = "root";
         String password = "1234";
         try (Connection connection = DriverManager.getConnection(connectionURL, user, password)) {
             
         }
-        catch (SQLExcepion e) {
-            System.out.println("Error SQL: " + e.get.Message());
+        catch (SQLException e) {
+            System.out.println("Error SQL: " + e.getMessage());
         }
+        
+        return true;
     }
 
     public int realizarRegistro(String cadena) {
@@ -105,7 +107,7 @@ public class HiloServidorRegistro extends Thread {
                 cadena = "" + resultado;
                 this.escribeSocket(skCliente, cadena);
             }
-            skCliente.close()
+            skCliente.close();
         }
         catch (Exception e) {
             System.out.println("Error: " + e.toString());

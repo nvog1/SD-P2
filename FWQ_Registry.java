@@ -26,7 +26,7 @@ public class FWQ_Registry {
                 Socket skCliente = skServidor.accept();
                 System.out.println("Sirviendo cliente...");
 
-                Thread t = new /**/HiloServidorRegistro/**/(skCliente);
+                Thread t = new FWQ_HiloServidorRegistro(skCliente);
                 t.start();
             }
         }

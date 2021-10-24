@@ -64,8 +64,20 @@ public class FWQ_Visitor {
 		// Problema: tener en cuenta cual era el alias anterior para mantenerlo
 	}
 
+	public void enviarKafka(KafkaProducer producer) {
+		// Preguntar construccion del mensage con el topic
+		ProducerRecord<String, Integer> record = new ProducerRecord<>();
+
+		try {
+			producer.send(record);
+		}
+		catch(Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
+	}
+
 	public String entrarParque() {
-		Properties kafkaProps = new Propoerties();
+		Properties kafkaProps = new Properties();
 		
 		kafkaProps.put("bootstrap.servers", "broker1:9092,broker2:9092");
 		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer," +
@@ -75,7 +87,7 @@ public class FWQ_Visitor {
 
 		producer = new KafkaProducer<String, Integer>(kafkaProps);
 		// Se enviara asincronamente con send()
-
+		enviarKafka(producer);
 	}
 
 	public String salirParque() {
@@ -141,8 +153,8 @@ public class FWQ_Visitor {
 						" Contraseña: "+ vectorResultados[2]);
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
-					while () {
-						System.out.println("¿Desea realizar alguna operacion más?");
+					while (resp != 's' || resp != 'n') {
+						System.out.println("¿Desea realizar alguna operacion más?(s, n)");
 						resp = br.readLine().charAt(0);
 					}
 					if (resp != 's') {
