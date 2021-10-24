@@ -1,12 +1,16 @@
 //hilo que espera las peticiones del engine, para que WTS no se quede bloqueado esperando.
 //cuando recibe petición, lee la bbdd y pasa la información a engine
 import java.net.*;
+import java.lang.Exception;
+import java.lang.reflect.Array;
+import java.net.Socket;
+import java.io.*;
 
-public class WTSHilo {
+public class WTSHilo extends Thread{
 	
-	private string puerto;
+	private String puerto;
 	
-	public MiHiloServidor(string puerto)
+	public WTSHilo(String puerto)
 	{
 		this.puerto = puerto;
 	}
@@ -44,18 +48,23 @@ public class WTSHilo {
 	}
 
 	public void run() {
-		ServerSocket ss = new ServerSocket(Integer.parseInt(puerto));
-		System.out.println("Escucho el puerto " + puerto);
+		try{
+			ServerSocket ss = new ServerSocket(Integer.parseInt(puerto));
+			System.out.println("Escucho el puerto " + puerto);
 
-		for(;;)
-		{
-			Socket cs = ss.accept();
-			System.out.println("Sirviendo al motor...");
+			for(;;)
+			{
+				Socket cs = ss.accept();
+				System.out.println("Sirviendo al motor...");
 
-			//lógica de servir al engine. (leer fichero con info, enviar datos)
+				//lógica de servir al engine. (leer fichero con info, enviar datos)
 
-			cs.close();
+				cs.close();
+			}
+		}
+		catch(Exception e){
+			System.out.println("Error:" + e.toString());
 		}
 		
-		
+	}		
 }
