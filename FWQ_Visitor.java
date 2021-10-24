@@ -62,9 +62,13 @@ public class FWQ_Visitor {
 
 	public String modificarDatos(String p_operacion, String p_resultado, String p_Cadena, Socket p_Socket_Con_Servidor) {
 		// Problema: tener en cuenta cual era el alias anterior para mantenerlo
+
+		//------------//
+		return "";
+		//------------//
 	}
 
-	public void enviarKafka(KafkaProducer producer) {
+	/*public void enviarKafka(KafkaProducer producer) {
 		// Preguntar construccion del mensage con el topic
 		ProducerRecord<String, Integer> record = new ProducerRecord<>();
 
@@ -88,10 +92,13 @@ public class FWQ_Visitor {
 		producer = new KafkaProducer<String, Integer>(kafkaProps);
 		// Se enviara asincronamente con send()
 		enviarKafka(producer);
-	}
+	}*/
 
 	public String salirParque() {
-
+		
+	//-----------//
+	return "";
+	//-----------//
 	}
 
 	// El visitante podra registrarse, modificar sus datos, entrar al parque, salir del parque...
@@ -122,7 +129,7 @@ public class FWQ_Visitor {
 					System.out.println("");
 				}
 				
-				switch(opcion) {
+				switch(operacion) {
 					case 1:
 						// Se registra al visitante
 						op = "registro";
@@ -161,7 +168,7 @@ public class FWQ_Visitor {
 						salir = 1;
 						escribeSocket(skRegistro, "fin");
 						cadena = leeSocket(skRegistro, cadena);
-						resultado = Integer.parseInt(cadena);
+						resultado = cadena;
 						if (resultado == "") {
 							skRegistro.close();
 							System.out.println("Conexion cerrada");
@@ -205,15 +212,16 @@ public class FWQ_Visitor {
 			}
 		}
 		catch(Exception e) {
-			System.ouy.println("Error: " + e.toString());
+			System.out.println("Error: " + e.toString());
 		}
 	}
 
     public static void main(String[] args) {
+		// localhost 9999 localhost 
         FWQ_Visitor visitante = new FWQ_Visitor();
 		int i = 0;
         String RegistryHost;
-        String RegsitryPort;
+        String RegistryPort;
         String QueueHandlerHost;
         String QueueHandlerPort;
 		
@@ -230,7 +238,7 @@ public class FWQ_Visitor {
 		QueueHandlerPort = args[3];
 
 		while(i == 0) {
-			visitante.menu(RegisrtyHost, RegistryPort, QueueHandlerHost, QueueHandlerPort);
+			visitante.menu(RegistryHost, RegistryPort, QueueHandlerHost, QueueHandlerPort);
 		}
     }
 }

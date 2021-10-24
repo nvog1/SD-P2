@@ -4,11 +4,6 @@ import java.io.*;
 import java.sql.*;
 
 public class FWQ_HiloServidorRegistro extends Thread {
-    /* TODO
-    / Campos implementables:
-    /  · Registro de clientes con nombre, coordenadas actuales y destino
-    */
-
     private Socket skCliente;
 
     public FWQ_HiloServidorRegistro(Socket p_Cliente) {
