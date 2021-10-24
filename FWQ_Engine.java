@@ -1,13 +1,11 @@
-import java.net.*
+import java.net.*;
+import java.lang.Exception;
+import java.lang.reflect.Array;
+import java.net.Socket;
+import java.io.*;
 
 public class FWQ_Engine {
 
-	private string ip_broker;
-	private string puerto_broker;
-	private string ip_wts;
-	private string puerto_wts;
-	private int maxVisitantes;
-	private int segundos;//segundos de espera entre peticiones al wts
 
 	/*
 	* Lee datos del socket. Supone que se le pasa un buffer con hueco 
@@ -59,12 +57,25 @@ public class FWQ_Engine {
 				System.out.println("Indica: ip_broker puerto_broker ip_wts puerto_wts maxVisitantes segundos");
 				System.exit(1);
 			}
+			String ip_broker;
+			String puerto_broker;
+			String ip_wts;
+			String puerto_wts;
+			int maxVisitantes;
+			int segundos = 0; //segundos de espera entre peticiones al wts
+
 			ip_broker = args[0];
 			puerto_broker = args[1];
 			ip_wts = args[2];
 			puerto_wts = args[3];
-			maxVisitantes = args[4];
-			segundos = args[5];
+			try{
+				maxVisitantes = Integer.parseInt(args[4]);
+				segundos = Integer.parseInt(args[5]);
+			}
+			catch(Exception e){
+				System.out.println("error al convertir parámetros");
+			}
+			
 
 			//conexion a kafka
 			//seguramente un thread, aún no sé cómo va kafka
@@ -74,13 +85,14 @@ public class FWQ_Engine {
 			//conexion a wts
 			String mensaje = "";
 
-			for(;;;){
+			for(;;){
 				try{
+					FWQ_Engine engine = new FWQ_Engine();
 					Socket clientSocket = new Socket(ip_wts, Integer.parseInt(puerto_wts));
 					mensaje = "1";
-					escribeSocket(clientSocket, mensaje);
+					engine.escribeSocket(clientSocket, mensaje);
 					mensaje = "";
-					mensaje = leeSocket(clientSocket, mensaje);
+					mensaje = engine.leeSocket(clientSocket, mensaje);
 					//procesar mensaje
 					clientSocket.close();
 					System.out.println("Conexión cerrada.");
