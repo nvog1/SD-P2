@@ -62,15 +62,26 @@ public class FWQ_HiloServidorRegistro extends Thread {
 
     public int realizarRegistro(String cadena) {
         // El caracter de separacion sera el punto y coma ';'
-        // Se guardara Alias/ID, Nombre y contraseña
+        // Se guardara Alias/ID, Nombre y contraseï¿½a
 
         String[] operacion = cadena.split(";");
         int result = 0;
 
-        if (operacion.length == 4) {
-            System.out.println("SRV: se va a " + operacion[0] + "un perfil con los siguientes datos" +
+        if (operacion.length == 2) {
+            // Comprobacion del Alias y Password
+            System.out.println("Se comprobarÃ¡n los datos del Alias " + operacion[0] +
+                " y contraseÃ±a " + operacion[1]);
+            
+            //----------//
+            // Conexion con la BD //
+            //----------//
+            
+        }
+        else if (operacion.length == 4) {
+            // Registro de usuario en BD
+            System.out.println("SRV: se va a " + operacion[0] + " un perfil con los siguientes datos" +
             " Alias/ID: " + operacion[1] + "; Nombre: " + operacion[2] + 
-            "; Contraseña: " + operacion[3]);
+            "; ContraseÃ±a: " + operacion[3]);
             
             //-------------------------------//
             // Conexion con la base de datos //

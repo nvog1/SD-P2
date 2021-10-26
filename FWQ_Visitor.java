@@ -48,7 +48,7 @@ public class FWQ_Visitor {
 		System.out.println("Datos utilizados ->" + 
 			" Alias/ID: " + ALIAS +
 			" Nombre: nombre" + ALIAS + 
-			" Contrase�a: pw" + ALIAS);
+			" Contraseña: pw" + ALIAS);
 		p_Cadena = p_operacion + ";" + ALIAS + 
 			";nombre" + ALIAS + ";pw" + ALIAS;
 		ALIAS++;
@@ -78,9 +78,46 @@ public class FWQ_Visitor {
 		catch(Exception e) {
 			System.out.println("Error: " + e.toString());
 		}
+	}*/
+
+	public boolean consultaEntrada(String AliasVisitor, String PWVisitor) {
+		// Se comprueba si los datos estan registrados
+		boolean result = false;
+		String cadena = "";
+
+		cadena = AliasVisitor + ";" + PWVisitor; 
+
+		return result;
 	}
 
 	public String entrarParque() {
+		String AliasVisitor = "";
+		String PWVisitor = "";
+		boolean visitroExists = false;
+
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader br = new BufferedReader(isr);
+
+		System.out.println("Introduzca su Alias/ID: ");
+		AliasVisitor = br.readLine();
+		System.out.println("\nIntroduzca su contraseña: ");
+		PWVisitor = br.readLine();
+
+		//-----------//
+		// Conexion con BD para comprobar alias y password //
+		//-----------//
+		visitorExists = consultaEntrada(AliasVisitor, PWVisitor);
+		if (visitorExists) {
+			// El visitante existe, hay que comprobar el aforo
+
+		}
+		else {
+			// El visitante no existe, se notifica
+			System.out.println("El usuario y contraseña introducidos no estan registrados");
+
+		}
+
+
 		Properties kafkaProps = new Properties();
 		
 		kafkaProps.put("bootstrap.servers", "broker1:9092,broker2:9092");
@@ -92,7 +129,7 @@ public class FWQ_Visitor {
 		producer = new KafkaProducer<String, Integer>(kafkaProps);
 		// Se enviara asincronamente con send()
 		enviarKafka(producer);
-	}*/
+	}
 
 	public String salirParque() {
 		
@@ -118,7 +155,7 @@ public class FWQ_Visitor {
 			//Socket skGestorColas = new Socket(p_QueueHandlerHost, Integer.parseInt(p_QueueHandlerPort));
 
 			while (salir == 0) {
-				operacion =0;
+				operacion = 0;
 				while (operacion != 1 && operacion != 2 && operacion != 3 && operacion != 4) {
 					System.out.println("[1] Registrar usuario");
 					System.out.println("[2] Modificar usuario");
@@ -143,25 +180,23 @@ public class FWQ_Visitor {
 					case 3: 
 						// Se quiere entrar al parque
 						op = "entrar";
-						//entrarParque();
 					break;
 					case 4:
 						// Se quiere salir del parque
 						op = "salir";
-						//salirParque();
 					break;
 				}
-				if (operacion == 0 || operacion == 1) {
+				if (operacion == 1 || operacion == 2) {
 					// Se realiza una operacion de registro o modificacion de datos
 					String[] vectorResultados = resultado.split(" ");
 					System.out.println("Los datos introducidos son ->" + 
 						" Alias/ID: " + vectorResultados[0] + 
 						" Nombre: " + vectorResultados[1] +
-						" Contrase�a: "+ vectorResultados[2]);
+						" Contraseña: "+ vectorResultados[2]);
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
 					while (resp != 's' || resp != 'n') {
-						System.out.println("�Desea realizar alguna operacion m�s?(s, n)");
+						System.out.println("¿Desea realizar alguna operacion mas? (s, n)");
 						resp = br.readLine().charAt(0);
 					}
 					if (resp != 's') {
@@ -176,9 +211,17 @@ public class FWQ_Visitor {
 						}
 					}
 				}
-				else {
+				else if (operacion == 3 || operacion == 4) {
 					// El visitante quiere entrar o salir del parque
 					// TODO implementar la comunicacion con FWQ_Engine mediante Kafka
+					if (operacion == 3) {
+						// Se quiere entrar al parque
+						entrarParque(op, resultado);
+					}
+					else if (operacion == 4) {
+						// Se quiere salir del parque (no se si serviria con un System.exit(0) directo)
+
+					}
 				}
 				cadena = "";
 				op = "";
