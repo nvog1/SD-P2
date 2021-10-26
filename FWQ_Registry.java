@@ -14,7 +14,7 @@ public class FWQ_Registry {
         try {
             if (args.length < 1) {
                 System.out.println("Debe indicar el puerto de escucha del servidor");
-                System.out.println("$./Servidor puerto_servidor");
+                System.out.println("$./FWQ_Registry puerto_servidor");
                 System.exit(1);
             }
             

@@ -48,7 +48,7 @@ public class FWQ_Visitor {
 		System.out.println("Datos utilizados ->" + 
 			" Alias/ID: " + ALIAS +
 			" Nombre: nombre" + ALIAS + 
-			" Contraseña: pw" + ALIAS);
+			" Contraseï¿½a: pw" + ALIAS);
 		p_Cadena = p_operacion + ";" + ALIAS + 
 			";nombre" + ALIAS + ";pw" + ALIAS;
 		ALIAS++;
@@ -115,7 +115,7 @@ public class FWQ_Visitor {
 		try {
 			Socket skRegistro = new Socket(p_registryHost, Integer.parseInt(p_registryPort));
 			// Habria que quitar el socket de gestorColas, implementado mediante Kafka
-			Socket skGestorColas = new Socket(p_QueueHandlerHost, Integer.parseInt(p_QueueHandlerPort));
+			//Socket skGestorColas = new Socket(p_QueueHandlerHost, Integer.parseInt(p_QueueHandlerPort));
 
 			while (salir == 0) {
 				operacion =0;
@@ -157,11 +157,11 @@ public class FWQ_Visitor {
 					System.out.println("Los datos introducidos son ->" + 
 						" Alias/ID: " + vectorResultados[0] + 
 						" Nombre: " + vectorResultados[1] +
-						" Contraseña: "+ vectorResultados[2]);
+						" Contraseï¿½a: "+ vectorResultados[2]);
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
 					while (resp != 's' || resp != 'n') {
-						System.out.println("¿Desea realizar alguna operacion más?(s, n)");
+						System.out.println("ï¿½Desea realizar alguna operacion mï¿½s?(s, n)");
 						resp = br.readLine().charAt(0);
 					}
 					if (resp != 's') {
