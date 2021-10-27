@@ -60,12 +60,44 @@ public class FWQ_HiloServidorRegistro extends Thread {
         return true;
     }
 
-    public int realizarRegistro(String cadena) {
+    public int consultarSocket(String cadena) {
         // El caracter de separacion sera el punto y coma ';'
         // Se guardara Alias/ID, Nombre y contrase�a
 
         String[] operacion = cadena.split(";");
         int result = 0;
+
+        if (operacion[0] == "entrar") {
+            // Se quiere entrar al parque
+            System.out.println("Se comprobaran los datos del Alias: " + operacion[1] 
+                + " y constraseña: " + operacion[2]);
+
+            try {
+            //------------------//
+            // Conexion con la BD //
+            //------------------//
+
+            }
+            catch (SQLException e) {
+                System.out.println("Error: " + e.toString());
+            }
+
+        }
+        else if (operacion[0] == "registrar") {
+            // Se quiere registrar un usuario
+            System.out.println("Se registrará el usuario con Alias/ID: " + operacion[1]
+                + "; Nombre: " + operacion[2]
+                + "; Contraseña: " + operacion[3]);
+            
+            //------------------//
+            // Conexion con la BD //
+            //------------------//
+
+        }
+        else if (operacion[0] == "modificar") {
+            // Se quiere modificar un usuario
+            System.out.println("");
+        }
 
         if (operacion.length == 2) {
             // Comprobacion del Alias y Password
@@ -109,7 +141,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
         try {
             while (resultado != -1) {
                 cadena = this.leeSocket(skCliente, cadena);
-                resultado = this.realizarRegistro(cadena);
+                resultado = this.consultarSocket(cadena);
                 cadena = "" + resultado;
                 this.escribeSocket(skCliente, cadena);
             }

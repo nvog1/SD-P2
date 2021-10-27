@@ -1,5 +1,8 @@
 import java.io.*;
 import java.net.*;
+import java.util.Properties;
+ 
+import org.apache.kafka.*;
 
 public class FWQ_Visitor {
 	// Variables globales
@@ -68,7 +71,7 @@ public class FWQ_Visitor {
 		//------------//
 	}
 
-	/*public void enviarKafka(KafkaProducer producer) {
+	public void enviarKafka(KafkaProducer producer) {
 		// Preguntar construccion del mensage con el topic
 		ProducerRecord<String, Integer> record = new ProducerRecord<>();
 
@@ -78,22 +81,26 @@ public class FWQ_Visitor {
 		catch(Exception e) {
 			System.out.println("Error: " + e.toString());
 		}
-	}*/
+	}
 
-	public boolean consultaEntrada(String AliasVisitor, String PWVisitor) {
+	public boolean consultaEntrada(String AliasVisitor, String PWVisitor, Socket skCliente) {
 		// Se comprueba si los datos estan registrados
 		boolean result = false;
 		String cadena = "";
 
-		cadena = AliasVisitor + ";" + PWVisitor; 
+		cadena = "entrar;" + AliasVisitor + ";" + PWVisitor; 
+
+		escribeSocket(skRegistro, cadena);
+		cadena = leeSocket(skRegistro, cadena);
+		result = cadena;
 
 		return result;
 	}
 
-	public String entrarParque() {
+	public String entrarParque(String op, String resultado, Socket skRegistro) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
-		boolean visitroExists = false;
+		boolean visitorExists = false;
 
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
@@ -106,7 +113,7 @@ public class FWQ_Visitor {
 		//-----------//
 		// Conexion con BD para comprobar alias y password //
 		//-----------//
-		visitorExists = consultaEntrada(AliasVisitor, PWVisitor);
+		visitorExists = consultaEntrada(AliasVisitor, PWVisitor, skRegistro);
 		if (visitorExists) {
 			// El visitante existe, hay que comprobar el aforo
 
@@ -117,9 +124,10 @@ public class FWQ_Visitor {
 
 		}
 
-
+		// Despues de comprobar si el usuario existe y el aforo no esta completo
 		Properties kafkaProps = new Properties();
 		
+		// Puede que broker2 no sea necesario
 		kafkaProps.put("bootstrap.servers", "broker1:9092,broker2:9092");
 		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer," +
 			"org.apache.kafka.common.serialization.IntegerSerializer"); 
@@ -129,6 +137,8 @@ public class FWQ_Visitor {
 		producer = new KafkaProducer<String, Integer>(kafkaProps);
 		// Se enviara asincronamente con send()
 		enviarKafka(producer);
+
+		return resultado;
 	}
 
 	public String salirParque() {
@@ -216,7 +226,7 @@ public class FWQ_Visitor {
 					// TODO implementar la comunicacion con FWQ_Engine mediante Kafka
 					if (operacion == 3) {
 						// Se quiere entrar al parque
-						entrarParque(op, resultado);
+						entrarParque(op, resultado, skRegistro);
 					}
 					else if (operacion == 4) {
 						// Se quiere salir del parque (no se si serviria con un System.exit(0) directo)
