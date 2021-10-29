@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Properties;
  
-import org.apache.kafka.*;
+import org.apache.kafka.clients.producer.*;
 
 public class FWQ_Visitor {
 	// Variables globales
@@ -71,9 +71,9 @@ public class FWQ_Visitor {
 		//------------//
 	}
 
-	public void enviarKafka(KafkaProducer producer) {
-		// Preguntar construccion del mensage con el topic
-		ProducerRecord<String, Integer> record = new ProducerRecord<>();
+	public void enviarKafka(KafkaProducer producer, String topic, String key, String value) {
+		// Preguntar construccion del mensage con el topic (topic, key, value)
+		ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, key, value);
 
 		try {
 			producer.send(record);
@@ -83,7 +83,7 @@ public class FWQ_Visitor {
 		}
 	}
 
-	public boolean consultaEntrada(String AliasVisitor, String PWVisitor, Socket skCliente) {
+	public boolean consultaEntrada(String AliasVisitor, String PWVisitor, Socket skRegistro) {
 		// Se comprueba si los datos estan registrados
 		boolean result = false;
 		String cadena = "";
@@ -92,7 +92,12 @@ public class FWQ_Visitor {
 
 		escribeSocket(skRegistro, cadena);
 		cadena = leeSocket(skRegistro, cadena);
-		result = cadena;
+		if (cadena == "true") {
+			result = true;
+		}
+		else {
+			result = false;
+		}
 
 		return result;
 	}
@@ -105,10 +110,15 @@ public class FWQ_Visitor {
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
 
+		try {
 		System.out.println("Introduzca su Alias/ID: ");
 		AliasVisitor = br.readLine();
 		System.out.println("\nIntroduzca su contraseña: ");
 		PWVisitor = br.readLine();
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
 
 		//-----------//
 		// Conexion con BD para comprobar alias y password //
@@ -129,14 +139,12 @@ public class FWQ_Visitor {
 		
 		// Puede que broker2 no sea necesario
 		kafkaProps.put("bootstrap.servers", "broker1:9092,broker2:9092");
-		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer," +
-			"org.apache.kafka.common.serialization.IntegerSerializer"); 
-		kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer," +
-			"org.apache.kafka.common.serialization.IntegerSerializer");
+		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
+		kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
-		producer = new KafkaProducer<String, Integer>(kafkaProps);
+		KafkaProducer producer = new KafkaProducer<String, String>(kafkaProps);
 		// Se enviara asincronamente con send()
-		enviarKafka(producer);
+		enviarKafka(producer, "topic", "key", "value");
 
 		return resultado;
 	}
