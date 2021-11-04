@@ -4,5 +4,5 @@
 *.json
 *.cache
 *.user
-*BBDD.*
 *.class
+*BBDD.*
