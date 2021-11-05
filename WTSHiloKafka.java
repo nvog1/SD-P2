@@ -3,6 +3,7 @@ import java.lang.Exception;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
+import java.util.Properties;
 
 public class WTSHiloKafka extends Thread {
 
