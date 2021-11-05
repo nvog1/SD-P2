@@ -4,6 +4,16 @@ import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
 
+/*------------------------------------
+TODO
+ 2 List<> que almacenan los ID de los visitors, funcion para comparar las 2 List<>
+  y que se suscriba a las que no contenga (no suscritas anteriormente)
+ 
+ OR 
+ Revisar 4.Kafka (actualizacion automatica de los topics suscritos)
+ consumer.subscribe(Pattern.compile("test.*"));
+*/
+
 public class FWQ_Engine {
 
 
@@ -57,12 +67,12 @@ public class FWQ_Engine {
 				System.out.println("Indica: ip_broker puerto_broker ip_wts puerto_wts maxVisitantes segundos");
 				System.exit(1);
 			}
-			String ip_broker;
-			String puerto_broker;
-			String ip_wts;
-			String puerto_wts;
-			int maxVisitantes;
-			int segundos = 0; //segundos de espera entre peticiones al wts
+			String ip_broker = "";
+			String puerto_broker = "";
+			String ip_wts = "";
+			String puerto_wts = "";
+			int maxVisitantes = -1;
+			int segundos = -1; //segundos de espera entre peticiones al wts
 
 			ip_broker = args[0];
 			puerto_broker = args[1];
@@ -73,20 +83,31 @@ public class FWQ_Engine {
 				segundos = Integer.parseInt(args[5]);
 			}
 			catch(Exception e){
-				System.out.println("error al convertir parámetros");
+				System.out.println("error al convertir parï¿½metros");
 			}
 			
 
 			//conexion a kafka
-			//seguramente un thread, aún no sé cómo va kafka
+			//seguramente un thread, aï¿½n no sï¿½ cï¿½mo va kafka
 			//tener en cuenta que este hilo va a estar durmiendo 3 segundos
 			//cada vez que pida info al WTS
 
 			//conexion a wts
+
 			String mensaje = "";
 
+			// Hilo de kafka
+			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker);
+			tKafka.start();
+
+			// Hilo de Sockets
 			for(;;){
-				try{
+				Socket skCLiente = skServidor.accept();
+				System.out.println("Sirviendo cliente...");
+
+				Thread tSocket = new FWQ_HiloEngineSocket(skCLiente);
+				tSocket.start();
+				/*try{
 					FWQ_Engine engine = new FWQ_Engine();
 					Socket clientSocket = new Socket(ip_wts, Integer.parseInt(puerto_wts));
 					mensaje = "1";
@@ -95,13 +116,13 @@ public class FWQ_Engine {
 					mensaje = engine.leeSocket(clientSocket, mensaje);
 					//procesar mensaje
 					clientSocket.close();
-					System.out.println("Conexión cerrada.");
+					System.out.println("Conexiï¿½n cerrada.");
 					Thread.sleep(segundos * 1000); //el tiempo lo pide en ms
 				}
 				catch(Exception e)
 				{
 					System.out.println("Error: " + e.toString());
-				}
+				}*/
 
 			}
 

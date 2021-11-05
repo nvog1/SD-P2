@@ -73,10 +73,11 @@ public class FWQ_Visitor {
 
 	public void enviarKafka(KafkaProducer producer, String topic, String key, String value) {
 		// Preguntar construccion del mensage con el topic (topic, key, value)
-		ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, key, value);
+		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
 
 		try {
-			producer.send(record);
+			// Aqui hay un warning que podemos obviar
+			producer.send(record, new DemoProducerCallback());
 		}
 		catch(Exception e) {
 			System.out.println("Error: " + e.toString());
@@ -302,4 +303,14 @@ public class FWQ_Visitor {
 			visitante.menu(RegistryHost, RegistryPort, QueueHandlerHost, QueueHandlerPort);
 		}
     }
+
+	private class DemoProducerCallback implements Callback {
+		@Override
+		public void onCompletion(RecordMetadata recordMetadata, Exception e){
+			if (e != null) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
+
