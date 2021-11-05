@@ -7,14 +7,10 @@ public class FWQ_WaitingTimeServer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
-		//parte de kafka
-		
-
-
-		//parte de socket server contra engine
 		
 		String puerto = "";
+		String ipBroker = "";
+		String puertoBroker = "";
 		
 		try
 		{
@@ -23,7 +19,16 @@ public class FWQ_WaitingTimeServer {
 				System.exit(1);
 			}
 			puerto = args[0];
-			Thread t = new WTSHiloSck(puerto);
+			ipBroker = args[1];
+			puertoBroker = args[2];
+
+			//sck thread
+			Thread tsck = new WTSHiloSck(puerto);
+			tsck.start();
+
+			//kafka thread
+			Thread tkafka = new WTSHiloKafka(ipBroker, puertoBroker);
+			tkafka.start();
 			
 		}
 		catch(Exception e)
