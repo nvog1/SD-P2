@@ -41,6 +41,7 @@ public class WTSHiloKafka extends Thread {
 
 				//lógica del hilokafka	
 			}
+		}
 	}
 
 }
