@@ -4,8 +4,10 @@ import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
 import java.util.Properties;
+import java.util.*;
+import java.time.*;
 
-import org.apache.kafka.clients.consumer.*
+import org.apache.kafka.clients.consumer.* ;
 
 public class WTSHiloKafka extends Thread {
 
