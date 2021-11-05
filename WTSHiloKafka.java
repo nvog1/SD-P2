@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.io.*;
 import java.util.Properties;
 
+import org.apache.kafka.clients.consumer.*
+
 public class WTSHiloKafka extends Thread {
 
 	private String ipBroker;
