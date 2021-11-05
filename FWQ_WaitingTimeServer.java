@@ -9,15 +9,7 @@ public class FWQ_WaitingTimeServer {
 	public static void main(String[] args) {
 
 		//parte de kafka
-		Properties props = new Properties();
-		props.put("bootstrap.servers", "broker1:9092,broker2:9092");
-		props.put("group.id", "CountryCounter");
-		props.put("key.deserializer",
-			"org.apache.kafka.common.serialization.StringDeserializer");
-		props.put("value.deserializer",
-			"org.apache.kafka.common.serialization.StringDeserializer");
-
-		KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+		
 
 
 		//parte de socket server contra engine
@@ -31,7 +23,7 @@ public class FWQ_WaitingTimeServer {
 				System.exit(1);
 			}
 			puerto = args[0];
-			Thread t = new WTSHilo(puerto);
+			Thread t = new WTSHiloSck(puerto);
 			
 		}
 		catch(Exception e)
