@@ -3,6 +3,7 @@ import java.lang.Exception;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
+import java.time.Duration;
 
 /*------------------------------------
 TODO
@@ -95,6 +96,7 @@ public class FWQ_Engine {
 			//conexion a wts
 
 			String mensaje = "";
+			ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto_wts));
 
 			// Hilo de kafka
 			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker);

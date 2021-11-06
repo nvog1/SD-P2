@@ -78,7 +78,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
             //------------------//
 
             }
-            catch (SQLException e) {
+            catch (Exception e) {
                 System.out.println("Error: " + e.toString());
             }
 

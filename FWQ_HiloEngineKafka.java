@@ -3,19 +3,28 @@ import org.apache.kafka.clients.consumer.*;
 import java.lang.Exception;
 import java.io.*;
 import java.util.Properties;
+import java.time.Duration;
 
 public class FWQ_HiloEngineKafka extends Thread {
-    private Properties props = new Properties();
+    private Properties ProducerProps = new Properties();
+    private Properties ConsumerProps = new Properties();
+    private KafkaProducer<String, String> producer;
     private KafkaConsumer<String, String> consumer;
 
 
-    public FWQ_HiloEngineKafka() {
-        this.props.put("bootstrap.servers", "broker1:9092,broker2:9092");
-        this.props.put("group.id", "CountryCounter");
-        this.props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        this.props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker) {
+        this.ProducerProps.put("bootstrap.servers", "broker1:" + puertoBroker);
+        this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
+        this.ProducerProps.put("value.serializer" , "org,apache.kafka.common.serialization.StringSerializer");
 
-        consumer = new KafkaConsumer<String, String>(props);
+        producer = new KafkaProducer<String, String>(ProducerProps);
+
+        this.ConsumerProps.put("bootstrap.servers", "broker1:" + puertoBroker);
+        this.ConsumerProps.put("group.id", "CountryCounter");
+        this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+        consumer = new KafkaConsumer<String, String>(ConsumerProps);
     }
 
     /*
@@ -34,7 +43,47 @@ public class FWQ_HiloEngineKafka extends Thread {
 	}
     */
 
-    public void run() {
+    // Comprueba si el Alias/ID esta registrado
+    public boolean entrarSalir(String topic, String value) {
+        boolean result = false;
 
+        return result;
+    }
+
+    public void procesarKafka(String topic, String key, String value) {
+        // Topic muestra el ALias/ID del Visitor
+        // Key muestra la accion que se quiere hacer
+        // Value muestra la opcion a la accion que se quiere hacer
+
+        System.out.println("Topic: " + topic + "; Key: " + key + "; Value: " + value);
+        if (key == "entrarSalir") {
+            // Se quiere entrar (value == "0") o salir (value == "1")
+            entrarSalir(topic, value);
+        }
+    }
+
+    public void run() {
+        boolean continuar = false;
+        Duration timeout = Duration.ofMillis(100);
+        String topic = "", key = "", value = "";
+
+        try {
+            // Bucle de escucha kafka
+            while (continuar) {
+                ConsumerRecords<String, String> records = consumer.poll(timeout);
+
+                for (ConsumerRecord<String, String> record : records) {
+                    // Asignamos las variables
+                    topic = record.topic();
+                    key = record.key();
+                    value = record.value();
+
+                    procesarKafka(topic, key, value);
+                }
+            }
+        }
+        catch (Exception e) {
+            System.out.println("Error: " + e.toString());
+        }
     }
 }

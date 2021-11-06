@@ -1,6 +1,7 @@
 import java.lang.Exception;
 import java.net.Socket;
 import java.io.*;
+import java.time.Duration;
 
 public class FWQ_HiloEngineSocket extends Thread {
     private Socket skCliente;
