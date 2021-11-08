@@ -3,7 +3,12 @@ import java.net.Socket;
 import java.io.*;
 import java.sql.*;
 
+
 public class FWQ_HiloServidorRegistro extends Thread {
+    Static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
+    Static final String USER = "root";
+    Static final String PASSWORD = "a96556994";
+
     private Socket skCliente;
 
     public FWQ_HiloServidorRegistro(Socket p_Cliente) {
@@ -40,18 +45,20 @@ public class FWQ_HiloServidorRegistro extends Thread {
 	}
 
     // Conexion con la Base de datos
-    // URL de Conexion
-    /*String connectionURL = "jdbc:mysql://localhost:3306/NOMBRE_BD";
-    String user = "root";
-    String password = "1234";*/
 
-    // Realizar una consulta a la base de datos
-    public boolean consultaSQL() {
-        String connectionURL = "jdbc:mysql://localhost:3306/NOMBRE_BD";
-        String user = "root";
-        String password = "1234";
-        try (Connection connection = DriverManager.getConnection(connectionURL, user, password)) {
+    // Insertar usuario
+    public boolean InsertarUsuarioSQL(String Alias, String nombre, String password) {
+        try {
+            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
+            Statement statement = connection.createStatement();
+            String sentence = "INSERT INTO Usuarios VALUEs ('" + Alias 
+                + "', '" + nombre + "', '" + password + "')"
+
+            System.out.println("Insertando usuario...");
+            // Sentencia de insercion
+            statement.executeUpdate(sentence);
+            System.out.println("Usuario insertado");
         }
         catch (SQLException e) {
             System.out.println("Error SQL: " + e.getMessage());
