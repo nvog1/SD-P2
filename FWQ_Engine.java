@@ -1,9 +1,14 @@
 import java.net.*;
+import java.lang.Object;
 import java.lang.Exception;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
 import java.time.Duration;
+import java.sql.DriverManager;
+import java.sql.*;
+import java.util.*;
+
 
 /*------------------------------------
 TODO
@@ -16,6 +21,9 @@ TODO
 */
 
 public class FWQ_Engine {
+    private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
+    private static final String USER = "root";
+    private static final String PASSWORD = "a96556994";
 
 
 	/*
@@ -55,6 +63,126 @@ public class FWQ_Engine {
 			System.out.println("Error: " + e.toString());
 		}
 		return;
+	}
+
+	// Funcion auxiliar para calcular la nueva posicion del visitante
+	public String calculaPos(String posicion, String direccion) {
+		String resultado = "";
+		int x, y;
+
+		// posicion = PosX;PosY
+		String[] vectorResultados = posicion.split(";");
+		x = Integer.parseInt(vectorResultados[0]);
+		y = Integer.parseInt(vectorResultados[1]);
+
+		// El mapa es de 20x20
+		switch(direccion) {
+			case "1":
+				// Norte
+				y = y - 1;
+				break;
+			case "2":
+				// Noreste
+				y = y - 1;
+				x = x + 1;
+				break;
+			case "3":
+				// Este
+				x = x +1;
+				break;
+			case "4":
+				// Sureste
+				x = x + 1;
+				y = y + 1;
+				break;
+			case "5":
+				// Sur
+				y = y + 1;
+				break;
+			case "6":
+				//Suroeste
+				x = x - 1;
+				y = y + 1;
+				break;
+			case "7":
+				//Oeste
+				x = x - 1;
+				break;
+			case "8":
+				// Noroeste
+				x = x - 1;
+				y= y - 1;
+				break;
+		}
+
+		if (x == -1) {
+			x = 19;
+		}
+		if (x == 20) {
+			x = 0;
+		}
+		if (y == -1) {
+			y = 19;
+		}
+		if (y == 20) {
+			y = 0;
+		}
+
+		resultado = x + ";" + y;
+		return resultado;
+	}
+
+	// Actualiza el mapa de la base de datos
+	public void actualizarMapaBD(String Alias, String posicion) {
+		System.out.println("Actualizando BD...");
+
+		try {
+			String[] vectorResultados = posicion.split(";");
+
+			Connection connection = new DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            
+            Statement statement = connection.createStatement();
+            String sentence = "UPDATE Mapa SET PosX = " + Integer.parseInt(vectorResultados[0] + 
+				", PosY = " + Integer.parseInt(vectorResultados[1]) + " WHERE Alias = '" + Alias + "'");
+
+			statement.executeUpdate(sentence);
+			statement.close();
+			System.out.println("BD actualizada");
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
+	}
+
+	// Actualiza y devuelve el mapa
+	public Map<String, String> actualizarMapa(String Alias, String direccion) {
+		// Query del mapa, recalcular posicion del alias y actualizar el mapa
+		Map<String, String> resultado = new HashMap<String, String>();
+
+		try {
+			Connection connection = new DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT * from FWQ_BBDD.Mapa");
+			// Se procesan los resultados obtenidos y modifica el alias
+			while (result.next()) {
+				String AliasMap = result.getString("Alias");
+				String posMap = result.getInt("PosX") + ";" + result.getInt("PosY");
+				
+				if (AliasMap == Alias) {
+					// Es el usuario que queremos actualizar
+					posMap = calculaPos(posMap, direccion);
+				
+					actualizarMapaBD(AliasMap, posMap);
+				}
+
+				resultado.put(AliasMap, posMap);
+			}
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
+
+		return resultado;
 	}
 
 	/**

@@ -5,9 +5,9 @@ import java.sql.*;
 
 
 public class FWQ_HiloServidorRegistro extends Thread {
-    Static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
-    Static final String USER = "root";
-    Static final String PASSWORD = "a96556994";
+    private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
+    private static final String USER = "root";
+    private static final String PASSWORD = "a96556994";
 
     private Socket skCliente;
 
@@ -47,24 +47,68 @@ public class FWQ_HiloServidorRegistro extends Thread {
     // Conexion con la Base de datos
 
     // Insertar usuario
-    public boolean InsertarUsuarioSQL(String Alias, String nombre, String password) {
+    public void InsertarUsuarioSQL(String Alias, String nombre, String password) {
         try {
-            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            Connection connection = new DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             Statement statement = connection.createStatement();
-            String sentence = "INSERT INTO Usuarios VALUEs ('" + Alias 
-                + "', '" + nombre + "', '" + password + "')"
+            String sentence = "INSERT INTO Usuarios VALUES ('" + Alias 
+                + "', '" + nombre + "', '" + password + "')";
 
             System.out.println("Insertando usuario...");
             // Sentencia de insercion
             statement.executeUpdate(sentence);
             System.out.println("Usuario insertado");
+            statement.close();
         }
         catch (SQLException e) {
             System.out.println("Error SQL: " + e.getMessage());
         }
+    }
+   public void UpdateUsuarioSQL(String Alias, String nombre, String password) {
+        try {
+            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            
+            Statement statement = connection.createStatement();
+            String sentence = "UPDATE Usuarios SET Nombre = '" + nombre + 
+                "', Contrasenya = '" + password + " WHERE Alias = '" + Alias + "'";
+
+            System.out.println("Actualizando usuario...");
+            // Sentencia de insercion
+            statement.executeUpdate(sentence);
+            System.out.println("Usuario Actualizado.");
+            statement.close();
+        }
+        catch (SQLException e) {
+            System.out.println("Error SQL: " + e.getMessage());
+        }
+    }
+
+    public boolean ConsultarUsuarioSQL(String Alias, String password) {
+        boolean resultado = false;
         
-        return true;
+        try {
+            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            
+            Statement statement = connection.createStatement();
+            String sentence = "SELECT Contrasenya FROM Usuarios WHERE Alias = '" + Alias + "'";
+            ResultSet result = new statement.executeQuery(sentence);
+            if (result.next) {
+                // Algun usuario concuerda con los datos
+                System.out.println("El usuario esta registrado.");
+                resultado = true;
+            }
+            else {
+                // Result esta vacio,no hay ningun usuario que concuerde
+                System.out.println("El usuario no esta registrado.");
+                resultado = false;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error SQL: " + e.getMessage());
+        }
+
+        return resultado;
     }
 
     public int consultarSocket(String cadena) {
@@ -74,7 +118,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
         String[] operacion = cadena.split(";");
         int result = 0;
 
-        if (operacion[0] == "entrar") {
+        /*if (operacion[0] == "entrar") {
             // Se quiere entrar al parque
             System.out.println("Se comprobaran los datos del Alias: " + operacion[1] 
                 + " y constraseña: " + operacion[2]);
@@ -90,22 +134,32 @@ public class FWQ_HiloServidorRegistro extends Thread {
             }
 
         }
-        else if (operacion[0] == "registrar") {
+        else*/ if (operacion[0] == "registrar") {
             // Se quiere registrar un usuario
             System.out.println("Se registrará el usuario con Alias/ID: " + operacion[1]
                 + "; Nombre: " + operacion[2]
                 + "; Contraseña: " + operacion[3]);
             
-            //------------------//
-            // Conexion con la BD //
-            //------------------//
+            InsertarUsuarioSQL(operacion[1], operacion[2], operacion[3]);
 
         }
         else if (operacion[0] == "modificar") {
             // Se quiere modificar un usuario
-            System.out.println("");
+            System.out.println("Se modificará el usuario con Alias/ID: " + operacion[1]
+                + "; Nombre: " + operacion[2]
+                + "; Contraseña: " + operacion[3]);
+            
+            UpdateUsuarioSQL(operacion[1], operacion[2], operacion[3]);
+        }
+        else if (operacion[0] == "consultar") {
+            // Se quiere saber si el usuario esta registrado
+            System.out.println("Se consultará el usuario con Alias/ID: " + operacion[1]
+                + "; Contraseña: " + operacion[2]);
+
+            ConsultarUsuarioSQL(operacion[1], operacion[2]);
         }
 
+        /*
         if (operacion.length == 2) {
             // Comprobacion del Alias y Password
             System.out.println("Se comprobarán los datos del Alias " + operacion[0] +
@@ -136,7 +190,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
         else {
             System.out.println("No se han proporcionado los campos necesarios");
             result = -1;
-        }
+        }*/
 
         return result;
     }

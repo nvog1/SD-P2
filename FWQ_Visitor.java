@@ -3,11 +3,9 @@ import java.net.*;
 import java.util.Properties;
  
 import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.consumer.*;
 
 public class FWQ_Visitor {
-	// Variables globales
-	int ALIAS = 0;
-
 
     public String leeSocket (Socket p_sk, String p_Datos)
 	{
@@ -47,14 +45,25 @@ public class FWQ_Visitor {
 
 	// Se piden los datos del visitante
 	public String pedirDatos(String p_operacion, String p_resultado, String p_Cadena, Socket p_Socket_Con_Servidor) {
-		// Los datos se implementan mediante variables globales incrementables
-		System.out.println("Datos utilizados ->" + 
-			" Alias/ID: " + ALIAS +
-			" Nombre: nombre" + ALIAS + 
-			" Contraseña: pw" + ALIAS);
-		p_Cadena = p_operacion + ";" + ALIAS + 
-			";nombre" + ALIAS + ";pw" + ALIAS;
-		ALIAS++;
+		String Alias = "", nombre = "", contrasenya = "";
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader br = new BufferedReader(isr);
+
+		try {
+		System.out.println("Introduzca su Alias/ID: ");
+		Alias = br.readLine();
+		System.out.println("Introduzca su nombre: ");
+		nombre = br.readLine();
+		System.out.println("\nIntroduzca su contraseña: ");
+		contrasenya = br.readLine();
+
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
+
+		p_Cadena = p_operacion + ";" + Alias + 
+			";" + nombre + ";" + contrasenya;
 		escribeSocket(p_Socket_Con_Servidor, p_Cadena);
 		p_Cadena = "";
 		p_Cadena = leeSocket(p_Socket_Con_Servidor, p_Cadena);
@@ -64,12 +73,52 @@ public class FWQ_Visitor {
 	}
 
 	public String modificarDatos(String p_operacion, String p_resultado, String p_Cadena, Socket p_Socket_Con_Servidor) {
-		// Problema: tener en cuenta cual era el alias anterior para mantenerlo
+		String Alias = "", nombre = "", contrasenya = "";
+		String nuevoNombre = "", nuevaContras = "";
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader br = new BufferedReader(isr);
 
-		//------------//
-		return "";
-		//------------//
-	}
+		try {
+			System.out.println("Introduzca su Alias/ID: ");
+			Alias = br.readLine();
+			System.out.println("\nIntroduzca su contraseña: ");
+			contrasenya = br.readLine();
+
+			// Se comprueban los datos introducidos
+			p_Cadena = "consultar;" + Alias + 
+				";" + contrasenya;
+			escribeSocket(p_Socket_Con_Servidor, p_Cadena);
+			p_Cadena = "";
+			p_Cadena = leeSocket(p_Socket_Con_Servidor, p_Cadena);
+
+			if (p_Cadena == "ok") {
+				// Se piden los datos nuevos y modifica la BD
+				System.out.println("El Alias/ID se mantendrá.");
+				System.out.println("Introduzca el nuevo nombre: ");
+				nuevoNombre = br.readLine();
+				System.out.println("Introduzca la nueva contraseña: ");
+				nuevaContras = br.readLine();
+
+				// Conexion con la base de datos
+				p_Cadena = "modificar;" + Alias + ";" +
+					nuevoNombre + ";" + nuevaContras;
+				escribeSocket(p_Socket_Con_Servidor, p_Cadena);
+				p_Cadena = "";
+				p_Cadena = leeSocket(p_Socket_Con_Servidor, p_Cadena);
+				System.out.println(p_Cadena);
+			}
+			else {
+				// Los datos introducidos no son correctos
+				System.out.println("Los datos introducidos no son correctos");
+				p_resultado = "-1";
+			}
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
+
+		return p_resultado;
+}
 
 	public void enviarKafka(KafkaProducer producer, String topic, String key, String value) {
 		// Preguntar construccion del mensage con el topic (topic, key, value)
@@ -145,7 +194,8 @@ public class FWQ_Visitor {
 
 		KafkaProducer producer = new KafkaProducer<String, String>(kafkaProps);
 		// Se enviara asincronamente con send()
-		enviarKafka(producer, "topic", "key", "value");
+		// topic = Alias, key = accion, value = info adicional a accion
+		enviarKafka(producer, AliasVisitor, "entrarSalir", "0");
 
 		return resultado;
 	}
