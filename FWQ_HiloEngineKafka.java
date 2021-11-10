@@ -9,8 +9,8 @@ public class FWQ_HiloEngineKafka extends Thread {
     private Properties ProducerProps = new Properties();
     private Properties ConsumerProps = new Properties();
     // hay que probar las 2 lineas siguientes
-    private KafkaProducer<String, String> producer = new KafkaProducer<>();
-    private KafkaConsumer<String, String> consumer = new KafkaConsumer<>();
+    private KafkaProducer<String, String> producer;
+    private KafkaConsumer<String, String> consumer;
 
 
     public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker) {
