@@ -49,7 +49,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
     // Insertar usuario
     public void InsertarUsuarioSQL(String Alias, String nombre, String password) {
         try {
-            Connection connection = new DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             Statement statement = connection.createStatement();
             String sentence = "INSERT INTO Usuarios VALUES ('" + Alias 
@@ -92,8 +92,8 @@ public class FWQ_HiloServidorRegistro extends Thread {
             
             Statement statement = connection.createStatement();
             String sentence = "SELECT Contrasenya FROM Usuarios WHERE Alias = '" + Alias + "'";
-            ResultSet result = new statement.executeQuery(sentence);
-            if (result.next) {
+            ResultSet result = statement.executeQuery(sentence);
+            if (result.next()) {
                 // Algun usuario concuerda con los datos
                 System.out.println("El usuario esta registrado.");
                 resultado = true;

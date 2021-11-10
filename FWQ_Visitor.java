@@ -289,7 +289,8 @@ public class FWQ_Visitor {
 					}
 					else if (operacion == 4) {
 						// Se quiere salir del parque (no se si serviria con un System.exit(0) directo)
-
+						System.out.println("Saiendo del parque...");
+						salir = 1;
 					}
 				}
 				cadena = "";

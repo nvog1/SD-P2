@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.io.*;
 import java.time.Duration;
 import java.sql.DriverManager;
+import java.sql.Connection;
 import java.sql.*;
 import java.util.*;
 
@@ -139,7 +140,7 @@ public class FWQ_Engine {
 		try {
 			String[] vectorResultados = posicion.split(";");
 
-			Connection connection = new DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             Statement statement = connection.createStatement();
             String sentence = "UPDATE Mapa SET PosX = " + Integer.parseInt(vectorResultados[0] + 
@@ -154,13 +155,56 @@ public class FWQ_Engine {
 		}
 	}
 
+	public String CadenaMapa(Map<String, String> mapa) {
+		char caracter = 'a';
+		String cadena = "";
+		Set<String> AliasMapa = mapa.keySet();
+		// Matriz que representa el mapa [x][y]
+		String[][] matriz = new String[20][20];
+
+		
+		cadena = "Leyenda del mapa\n" + 
+			"Caracter\tID\tPos\n";
+
+		// Recorre todo el map para hacer la leyenda
+		for (String Alias : AliasMapa) {
+			String[] vectorResultados = mapa.get(Alias).split(";");
+			int x = Integer.parseInt(vectorResultados[0]);
+			int y = Integer.parseInt(vectorResultados[1]);
+			cadena = cadena + caracter + "\t" + Alias + "\t" + mapa.get(Alias) + "\n";
+
+			matriz[y][x] = Character.toString(caracter);
+			caracter++;
+		}
+
+		// Creacion del mapa
+		for(int i = 0; i < 20; i++) {
+			for (int j = 0; j < 20; j++){
+				if (matriz[i][j] == null) {
+					cadena = cadena + "·";
+				}
+				else {
+					// Implementado para los visitantes
+					Character aux = matriz[i][j].charAt(0);
+					if (aux.isLetter(matriz[i][j].charAt(0))) {
+						// En la matriz hay un caracter (un visitante)
+						cadena = cadena + matriz[i][j];
+					}
+				}
+			}
+			cadena = cadena + "\n";
+		}
+
+		return cadena;
+	}
+
 	// Actualiza y devuelve el mapa
 	public Map<String, String> actualizarMapa(String Alias, String direccion) {
 		// Query del mapa, recalcular posicion del alias y actualizar el mapa
 		Map<String, String> resultado = new HashMap<String, String>();
 
 		try {
-			Connection connection = new DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Connection connection =  DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery("SELECT * from FWQ_BBDD.Mapa");
 			// Se procesan los resultados obtenidos y modifica el alias
