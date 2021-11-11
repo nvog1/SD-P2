@@ -54,7 +54,7 @@ public class FWQ_Visitor {
 		Alias = br.readLine();
 		System.out.println("Introduzca su nombre: ");
 		nombre = br.readLine();
-		System.out.println("Introduzca su contraseña: ");
+		System.out.println("Introduzca su contrasenya: ");
 		contrasenya = br.readLine();
 
 		}
@@ -81,7 +81,7 @@ public class FWQ_Visitor {
 		try {
 			System.out.println("Introduzca su Alias/ID: ");
 			Alias = br.readLine();
-			System.out.println("\nIntroduzca su contraseña: ");
+			System.out.println("Introduzca su contrasenya: ");
 			contrasenya = br.readLine();
 
 			// Se comprueban los datos introducidos
@@ -91,12 +91,12 @@ public class FWQ_Visitor {
 			p_Cadena = "";
 			p_Cadena = leeSocket(p_Socket_Con_Servidor, p_Cadena);
 
-			if (p_Cadena == "ok") {
+			if (p_Cadena.equals("true")) {
 				// Se piden los datos nuevos y modifica la BD
-				System.out.println("El Alias/ID se mantendrá.");
+				System.out.println("El Alias/ID se mantendra.");
 				System.out.println("Introduzca el nuevo nombre: ");
 				nuevoNombre = br.readLine();
-				System.out.println("Introduzca la nueva contraseña: ");
+				System.out.println("Introduzca la nueva contrasenya: ");
 				nuevaContras = br.readLine();
 
 				// Conexion con la base de datos
@@ -105,7 +105,7 @@ public class FWQ_Visitor {
 				escribeSocket(p_Socket_Con_Servidor, p_Cadena);
 				p_Cadena = "";
 				p_Cadena = leeSocket(p_Socket_Con_Servidor, p_Cadena);
-				System.out.println(p_Cadena);
+				p_resultado = p_Cadena;
 			}
 			else {
 				// Los datos introducidos no son correctos
@@ -138,7 +138,7 @@ public class FWQ_Visitor {
 		boolean result = false;
 		String cadena = "";
 
-		cadena = "entrar;" + AliasVisitor + ";" + PWVisitor; 
+		cadena = "consultar;" + AliasVisitor + ";" + PWVisitor; 
 
 		escribeSocket(skRegistro, cadena);
 		cadena = "";
@@ -164,7 +164,7 @@ public class FWQ_Visitor {
 		try {
 		System.out.println("Introduzca su Alias/ID: ");
 		AliasVisitor = br.readLine();
-		System.out.println("\nIntroduzca su contraseña: ");
+		System.out.println("Introduzca su contrasenya: ");
 		PWVisitor = br.readLine();
 		}
 		catch (Exception e) {
@@ -181,7 +181,7 @@ public class FWQ_Visitor {
 		}
 		else {
 			// El visitante no existe, se notifica
-			System.out.println("El usuario y contraseña introducidos no estan registrados");
+			System.out.println("El usuario y contrasenya introducidos no estan registrados");
 
 		}
 
@@ -262,7 +262,7 @@ public class FWQ_Visitor {
 					System.out.println("Los datos introducidos son ->" + 
 						" Alias/ID: " + vectorResultados[1] + 
 						" Nombre: " + vectorResultados[2] +
-						" Contraseña: "+ vectorResultados[3]);
+						" Contrasenya: "+ vectorResultados[3]);
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
 					while (resp != 's' && resp != 'n') {
@@ -274,7 +274,7 @@ public class FWQ_Visitor {
 						escribeSocket(skRegistro, "fin");
 						cadena = leeSocket(skRegistro, cadena);
 						resultado = cadena;
-						if (resultado == "") {
+						if (resultado == "fin") {
 							skRegistro.close();
 							System.out.println("Conexion cerrada");
 							System.exit(0);
@@ -283,16 +283,14 @@ public class FWQ_Visitor {
 				}
 				else if (operacion == 3 || operacion == 4) {
 					// El visitante quiere entrar o salir del parque
-					// TODO implementar la comunicacion con FWQ_Engine mediante Kafka
 					if (operacion == 3) {
 						// Se quiere entrar al parque
 						entrarParque(op, resultado, skRegistro);
 					}
 					else if (operacion == 4) {
-						// Se quiere salir del parque (no se si serviria con un System.exit(0) directo)
 						escribeSocket(skRegistro, "fin");
 						cadena = leeSocket(skRegistro, cadena);
-						if (resultado == "") {
+						if (cadena == "fin") {
 							skRegistro.close();
 							System.out.println("Conexion cerrada");
 							System.exit(0);
