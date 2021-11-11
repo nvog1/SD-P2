@@ -48,6 +48,8 @@ public class FWQ_HiloServidorRegistro extends Thread {
 
     // Insertar usuario
     public void InsertarUsuarioSQL(String Alias, String nombre, String password) {
+        System.out.println("Entra a InsertarUsuarioSQL()");
+
         try {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
@@ -115,6 +117,8 @@ public class FWQ_HiloServidorRegistro extends Thread {
         // El caracter de separacion sera el punto y coma ';'
         // Se guardara Alias/ID, Nombre y contrase�a
 
+        //------------//
+        System.out.println("Cadena: " + cadena);
         String[] operacion = cadena.split(";");
         String result = "";
 
@@ -140,6 +144,9 @@ public class FWQ_HiloServidorRegistro extends Thread {
                 + "; Nombre: " + operacion[2]
                 + "; Contraseña: " + operacion[3]);
             
+            //--------
+            System.out.println("InsertarUsuarioSQL() con " + operacion[1] +
+                "; " + operacion[2] + "; " + operacion[3]);
             InsertarUsuarioSQL(operacion[1], operacion[2], operacion[3]);
             result = cadena;
         }
