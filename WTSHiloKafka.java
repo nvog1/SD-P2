@@ -26,26 +26,34 @@ public class WTSHiloKafka extends Thread {
 		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-		KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+		try{
 
-		consumer.subscribe(Collections.singletonList("Sensores"));
+		
+		
+			KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
 
-		Duration timeout = Duration.ofMillis(100);
+			consumer.subscribe(Collections.singletonList("Sensores"));
 
-		while (true) {
-			ConsumerRecords<String, String> records = consumer.poll(timeout);
+			Duration timeout = Duration.ofMillis(100);
 
-			for (ConsumerRecord<String, String> record : records) {
+			while (true) {
+				ConsumerRecords<String, String> records = consumer.poll(timeout);
 
-				//TEST
-				System.out.printf("topic = %s, partition = %d, offset = %d, " +
-								"customer = %s, country = %s\n",
-				record.topic(), record.partition(), record.offset(),
-						record.key(), record.value());
-				//TEST
+				for (ConsumerRecord<String, String> record : records) {
 
-				//lógica del hilokafka	
+					//TEST
+					System.out.printf("topic = %s, partition = %d, offset = %d, " +
+									"customer = %s, country = %s\n",
+					record.topic(), record.partition(), record.offset(),
+							record.key(), record.value());
+					//TEST
+
+					//lógica del hilokafka	
+				}
 			}
+		}
+		catch(Exception e){
+			System.out.println("Exception: " + e.toString());
 		}
 	}
 
