@@ -153,7 +153,7 @@ public class FWQ_Visitor {
 		return result;
 	}
 
-	public String entrarParque(String op, String resultado, Socket skRegistro) {
+	public String entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
 		boolean visitorExists = false;
@@ -175,7 +175,7 @@ public class FWQ_Visitor {
 		Properties kafkaProps = new Properties();
 		
 		// Puede que broker2 no sea necesario
-		kafkaProps.put("bootstrap.servers", "broker1:9092,broker2:9092");
+		kafkaProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
 		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
 		kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
@@ -286,7 +286,7 @@ public class FWQ_Visitor {
 					// El visitante quiere entrar o salir del parque
 					if (operacion == 3) {
 						// Se quiere entrar al parque
-						entrarParque(op, resultado, skRegistro);
+						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
 					}
 					else if (operacion == 4) {
 						escribeSocket(skRegistro, "fin");
