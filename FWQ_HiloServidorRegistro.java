@@ -203,17 +203,13 @@ public class FWQ_HiloServidorRegistro extends Thread {
     }
 
     public void run() {
-        int resultado = 0;
-        String cadena = "";
+        String cadena = "", resultado = "";
 
         try {
-            while (resultado != -1) {
+            while (resultado != "fin") {
                 cadena = this.leeSocket(skCliente, cadena);
-                cadena = this.consultarSocket(cadena);
+                resultado = this.consultarSocket(cadena);
                 this.escribeSocket(skCliente, cadena);
-                if (cadena == "fin") {
-                    resultado = -1;
-                }
             }
             skCliente.close();
         }
