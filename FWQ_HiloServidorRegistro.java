@@ -7,7 +7,7 @@ import java.sql.*;
 public class FWQ_HiloServidorRegistro extends Thread {
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
-    private static final String PASSWORD = "a96556994";
+    private static final String PASSWORD = "1234";
 
     private Socket skCliente;
 
