@@ -6,11 +6,11 @@ import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
 
-public class WTSHilo extends Thread{
+public class WTSHiloSck extends Thread{
 	
 	private String puerto;
 	
-	public WTSHilo(String puerto)
+	public WTSHiloSck(String puerto)
 	{
 		this.puerto = puerto;
 	}
