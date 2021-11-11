@@ -5,3 +5,5 @@
 *.cache
 *.user
 *.class
+*.dbmdl
+*.jfm
