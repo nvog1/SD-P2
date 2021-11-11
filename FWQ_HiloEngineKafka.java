@@ -3,6 +3,7 @@ import org.apache.kafka.clients.consumer.*;
 import java.lang.Exception;
 import java.io.*;
 import java.util.Properties;
+import java.util.*;
 import java.time.Duration;
 
 public class FWQ_HiloEngineKafka extends Thread {
@@ -14,18 +15,20 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 
     public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker) {
-        this.ProducerProps.put("bootstrap.servers", "broker1:" + puertoBroker);
+        this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
-        this.ProducerProps.put("value.serializer" , "org,apache.kafka.common.serialization.StringSerializer");
+        this.ProducerProps.put("value.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
 
         producer = new KafkaProducer<String, String>(ProducerProps);
 
-        this.ConsumerProps.put("bootstrap.servers", "broker1:" + puertoBroker);
-        this.ConsumerProps.put("group.id", "CountryCounter");
+        this.ConsumerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
+        this.ConsumerProps.put("group.id", "Visitors");
         this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
         consumer = new KafkaConsumer<String, String>(ConsumerProps);
+        // Suscribir el consumer a un topic
+		consumer.subscribe(Collections.singletonList("SD"));
     }
 
 	// GroupID para diferenciar los topics? (en o'reilly trata el groupID como el topic)
@@ -65,7 +68,7 @@ public class FWQ_HiloEngineKafka extends Thread {
     }
 
     public void run() {
-        boolean continuar = false;
+        boolean continuar = true;
         Duration timeout = Duration.ofMillis(100);
         String topic = "", key = "", value = "";
 
