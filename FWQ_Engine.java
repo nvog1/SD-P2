@@ -24,7 +24,7 @@ TODO
 public class FWQ_Engine {
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
-    private static final String PASSWORD = "a96556994";
+    private static final String PASSWORD = "1234";
 
 
 	/*
