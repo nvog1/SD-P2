@@ -14,13 +14,13 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 
     public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker) {
-        this.ProducerProps.put("bootstrap.servers", "broker1:" + puertoBroker);
+        this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
-        this.ProducerProps.put("value.serializer" , "org,apache.kafka.common.serialization.StringSerializer");
+        this.ProducerProps.put("value.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
 
         producer = new KafkaProducer<String, String>(ProducerProps);
 
-        this.ConsumerProps.put("bootstrap.servers", "broker1:" + puertoBroker);
+        this.ConsumerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ConsumerProps.put("group.id", "CountryCounter");
         this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
@@ -42,12 +42,44 @@ public class FWQ_HiloEngineKafka extends Thread {
 		consumer.subscribe(Collections.singletonList(groupID));
 	}*/
     
+    public boolean ConsultarUsuarioSQL(String Alias, String password) {
+        boolean resultado = false;
+        
+        try {
+            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            
+            Statement statement = connection.createStatement();
+            String sentence = "SELECT Contrasenya FROM Usuarios WHERE Alias = '" + Alias + "'";
+            ResultSet result = statement.executeQuery(sentence);
+            if (result.next()) {
+                // Algun usuario concuerda con los datos
+                System.out.println("El usuario esta registrado.");
+                resultado = true;
+            }
+            else {
+                // Result esta vacio,no hay ningun usuario que concuerde
+                System.out.println("El usuario no esta registrado.");
+                resultado = false;
+            }
+            statement.close();
+        }
+        catch (SQLException e) {
+            System.out.println("Error SQL: " + e.getMessage());
+        }
+
+        return resultado;
+    }
+
     // Comprueba si el Alias/ID esta registrado
     public boolean entrarSalir(String topic, String value) {
         boolean result = false;
 
         if (value == "0") {
             // El usuario quiere entrar al parque
+            System.out.println("El usuario " + topic + " quiere entrar al parque");
+
+            // Comprobacion de que el usuario esta registrado
+
         }
         return result;
     }
