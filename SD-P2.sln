@@ -15,7 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		FWQ_Visitor.java = FWQ_Visitor.java
 		FWQ_WaitingTimeServer.java = FWQ_WaitingTimeServer.java
 		README.md = README.md
-		WTSHilo.java = WTSHilo.java
+		WTSHiloKafka.java = WTSHiloKafka.java
+		WTSHiloSck.java = WTSHiloSck.java
 	EndProjectSection
 EndProject
 Global
