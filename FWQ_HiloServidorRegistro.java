@@ -111,12 +111,12 @@ public class FWQ_HiloServidorRegistro extends Thread {
         return resultado;
     }
 
-    public int consultarSocket(String cadena) {
+    public String consultarSocket(String cadena) {
         // El caracter de separacion sera el punto y coma ';'
         // Se guardara Alias/ID, Nombre y contrase�a
 
         String[] operacion = cadena.split(";");
-        int result = 0;
+        String result = "";
 
         /*if (operacion[0] == "entrar") {
             // Se quiere entrar al parque
@@ -141,7 +141,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
                 + "; Contraseña: " + operacion[3]);
             
             InsertarUsuarioSQL(operacion[1], operacion[2], operacion[3]);
-
+            result = cadena;
         }
         else if (operacion[0] == "modificar") {
             // Se quiere modificar un usuario
@@ -150,6 +150,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
                 + "; Contraseña: " + operacion[3]);
             
             UpdateUsuarioSQL(operacion[1], operacion[2], operacion[3]);
+            result = cadena;
         }
         else if (operacion[0] == "consultar") {
             // Se quiere saber si el usuario esta registrado
@@ -157,6 +158,12 @@ public class FWQ_HiloServidorRegistro extends Thread {
                 + "; Contraseña: " + operacion[2]);
 
             ConsultarUsuarioSQL(operacion[1], operacion[2]);
+            result = "true";
+        }
+
+        else if (operacion[0] == "fin") {
+            System.out.println("Se va a salir del parque");
+            result = "fin";
         }
 
         /*
@@ -202,9 +209,11 @@ public class FWQ_HiloServidorRegistro extends Thread {
         try {
             while (resultado != -1) {
                 cadena = this.leeSocket(skCliente, cadena);
-                resultado = this.consultarSocket(cadena);
-                cadena = "" + resultado;
+                cadena = this.consultarSocket(cadena);
                 this.escribeSocket(skCliente, cadena);
+                if (cadena == "fin") {
+                    resultado = -1;
+                }
             }
             skCliente.close();
         }

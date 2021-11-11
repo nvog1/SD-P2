@@ -54,7 +54,7 @@ public class FWQ_Visitor {
 		Alias = br.readLine();
 		System.out.println("Introduzca su nombre: ");
 		nombre = br.readLine();
-		System.out.println("\nIntroduzca su contraseña: ");
+		System.out.println("Introduzca su contraseña: ");
 		contrasenya = br.readLine();
 
 		}
@@ -141,6 +141,7 @@ public class FWQ_Visitor {
 		cadena = "entrar;" + AliasVisitor + ";" + PWVisitor; 
 
 		escribeSocket(skRegistro, cadena);
+		cadena = "";
 		cadena = leeSocket(skRegistro, cadena);
 		if (cadena == "true") {
 			result = true;
@@ -238,12 +239,12 @@ public class FWQ_Visitor {
 				switch(operacion) {
 					case 1:
 						// Se registra al visitante
-						op = "registro";
+						op = "registrar";
 						resultado = pedirDatos(op, resultado, cadena, skRegistro);
 					break;
 					case 2:
 						// Se modifican los datos del cliente
-						op = "modificacion";
+						op = "modificar";
 						resultado = modificarDatos(op, resultado, cadena, skRegistro);
 					break;
 					case 3: 
@@ -257,11 +258,11 @@ public class FWQ_Visitor {
 				}
 				if (operacion == 1 || operacion == 2) {
 					// Se realiza una operacion de registro o modificacion de datos
-					String[] vectorResultados = resultado.split(" ");
+					String[] vectorResultados = resultado.split(";");
 					System.out.println("Los datos introducidos son ->" + 
-						" Alias/ID: " + vectorResultados[0] + 
-						" Nombre: " + vectorResultados[1] +
-						" Contraseña: "+ vectorResultados[2]);
+						" Alias/ID: " + vectorResultados[1] + 
+						" Nombre: " + vectorResultados[2] +
+						" Contraseña: "+ vectorResultados[3]);
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
 					while (resp != 's' || resp != 'n') {
@@ -289,7 +290,14 @@ public class FWQ_Visitor {
 					}
 					else if (operacion == 4) {
 						// Se quiere salir del parque (no se si serviria con un System.exit(0) directo)
-						System.out.println("Saiendo del parque...");
+						escribeSocket(skRegistro, "fin");
+						cadena = leeSocket(skRegistro, cadena);
+						if (resultado == "") {
+							skRegistro.close();
+							System.out.println("Conexion cerrada");
+							System.exit(0);
+						}
+						System.out.println("Saliendo del parque...");
 						salir = 1;
 					}
 				}
@@ -355,7 +363,7 @@ public class FWQ_Visitor {
 		}
     }
 
-	private class DemoProducerCallback implements Callback {
+	private static class DemoProducerCallback implements Callback {
 		@Override
 		public void onCompletion(RecordMetadata recordMetadata, Exception e){
 			if (e != null) {
