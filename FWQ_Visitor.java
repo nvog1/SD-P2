@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
 import java.util.Properties;
+import java.util.*;
+import java.time.*;
  
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.clients.consumer.*;
@@ -118,9 +120,9 @@ public class FWQ_Visitor {
 		}
 
 		return p_resultado;
-}
+	}
 
-	public void enviarKafka(KafkaProducer producer, String topic, String key, String value) {
+	public void enviarKafka(KafkaProducer producer, String topic, String key, String value, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		// Preguntar construccion del mensage con el topic (topic, key, value)
 		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
 
@@ -129,6 +131,35 @@ public class FWQ_Visitor {
 			producer.send(record, new DemoProducerCallback());
 		}
 		catch(Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
+
+		// Consumer recibe la respuesta
+		Properties ConsumerProps = new Properties();
+		ConsumerProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
+        ConsumerProps.put("group.id", "Visitors");
+        ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+		try {
+			KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(ConsumerProps);
+			// Suscribir el consumer a un topic
+			consumer.subscribe(Collections.singletonList("SD"));
+			Duration timeout = Duration.ofMillis(100);
+			boolean continuar = true;
+
+			while (continuar) {
+				ConsumerRecords<String, String> records = consumer.poll(timeout);
+
+				for (ConsumerRecord<String, String> consumerRecord : records) {
+					if (consumerRecord.value().equals("entrar")) {
+						System.out.println("El usuario puede entrar");
+						continuar = false;
+					}
+				}
+			}
+		}
+		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
 		}
 	}
@@ -154,7 +185,6 @@ public class FWQ_Visitor {
 		// Consulta si el usuario esta registrado
 		Properties kafkaProps = new Properties();
 		
-		// Puede que broker2 no sea necesario
 		kafkaProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
 		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
 		kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -162,19 +192,7 @@ public class FWQ_Visitor {
 		KafkaProducer producer = new KafkaProducer<String, String>(kafkaProps);
 		// Se enviara asincronamente con send()
 		// topic = Alias, key = accion, value = info adicional a accion
-		enviarKafka(producer, AliasVisitor, "entrarSalir", "0");
-
-		// Consumer recibe la respuesta
-		this.ConsumerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
-        this.ConsumerProps.put("group.id", "Visitors");
-        this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-
-        consumer = new KafkaConsumer<String, String>(ConsumerProps);
-        // Suscribir el consumer a un topic
-		consumer.subscribe(Collections.singletonList("SD"));
-		recibirKafka();
-		
+		enviarKafka(producer, AliasVisitor, "entrarSalir", "0", p_QueueHandlerHost, p_QueueHandlerPort);		
 
 		return resultado;
 	}
@@ -199,8 +217,6 @@ public class FWQ_Visitor {
 
 		try {
 			Socket skRegistro = new Socket(p_registryHost, Integer.parseInt(p_registryPort));
-			// Habria que quitar el socket de gestorColas, implementado mediante Kafka
-			//Socket skGestorColas = new Socket(p_QueueHandlerHost, Integer.parseInt(p_QueueHandlerPort));
 
 			while (salir == 0) {
 				operacion = 0;
@@ -288,7 +304,6 @@ public class FWQ_Visitor {
 
 	// El visitante podra hacer alguna actividad relacionada con el parque o salir
 	public void menu(String p_registryHost, String p_registryPort, String p_QueueHandlerHost, String p_QueueHandlerPort) {
-		// Implementacion de la eleccion mediante numero aleatorio (num de acciones posibles es 2)
 		int opcion = 0;
 
 		try {

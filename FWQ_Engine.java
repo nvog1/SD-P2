@@ -10,17 +10,6 @@ import java.sql.Connection;
 import java.sql.*;
 import java.util.*;
 
-
-/*------------------------------------
-TODO
- 2 List<> que almacenan los ID de los visitors, funcion para comparar las 2 List<>
-  y que se suscriba a las que no contenga (no suscritas anteriormente)
- 
- OR 
- Revisar 4.Kafka (actualizacion automatica de los topics suscritos)
- consumer.subscribe(Pattern.compile("test.*"));
-*/
-
 public class FWQ_Engine {
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/fwq_bbdd?useSSL=false";
     private static final String USER = "root";
