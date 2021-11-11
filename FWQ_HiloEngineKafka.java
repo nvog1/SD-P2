@@ -28,9 +28,8 @@ public class FWQ_HiloEngineKafka extends Thread {
         consumer = new KafkaConsumer<String, String>(ConsumerProps);
     }
 
-    /*
 	// GroupID para diferenciar los topics? (en o'reilly trata el groupID como el topic)
-	public String leerKafka(String groupID) {
+	/*public String leerKafka(String groupID) {
 		Properties props = new Properties();
 		props.put("bootstrap.servers", "broker1:9092");
 		props.put("group.id", groupID);
@@ -41,9 +40,8 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		// Suscribir el consumer a un topic
 		consumer.subscribe(Collections.singletonList(groupID));
-	}
-    */
-
+	}*/
+    
     // Comprueba si el Alias/ID esta registrado
     public boolean entrarSalir(String topic, String value) {
         boolean result = false;

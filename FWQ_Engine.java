@@ -22,9 +22,9 @@ TODO
 */
 
 public class FWQ_Engine {
-    private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
+    /*private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/fwq_bbdd?useSSL=false";
     private static final String USER = "root";
-    private static final String PASSWORD = "1234";
+    private static final String PASSWORD = "1234";*/
 
 
 	/*
@@ -67,7 +67,7 @@ public class FWQ_Engine {
 	}
 
 	// Funcion auxiliar para calcular la nueva posicion del visitante
-	public String calculaPos(String posicion, String direccion) {
+	/*public String calculaPos(String posicion, String direccion) {
 		String resultado = "";
 		int x, y;
 
@@ -227,7 +227,7 @@ public class FWQ_Engine {
 		}
 
 		return resultado;
-	}
+	}*/
 
 	/**
 	 * @param args

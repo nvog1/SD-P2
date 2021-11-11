@@ -265,7 +265,7 @@ public class FWQ_Visitor {
 						" Contraseña: "+ vectorResultados[3]);
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
-					while (resp != 's' || resp != 'n') {
+					while (resp != 's' && resp != 'n') {
 						System.out.println("¿Desea realizar alguna operacion mas? (s, n)");
 						resp = br.readLine().charAt(0);
 					}
