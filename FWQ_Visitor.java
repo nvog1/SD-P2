@@ -171,21 +171,7 @@ public class FWQ_Visitor {
 			System.out.println("Error: " + e.toString());
 		}
 
-		//-----------//
-		// Conexion con BD para comprobar alias y password //
-		//-----------//
-		visitorExists = consultaEntrada(AliasVisitor, PWVisitor, skRegistro);
-		if (visitorExists) {
-			// El visitante existe, hay que comprobar el aforo
-
-		}
-		else {
-			// El visitante no existe, se notifica
-			System.out.println("El usuario y contrasenya introducidos no estan registrados");
-
-		}
-
-		// Despues de comprobar si el usuario existe y el aforo no esta completo
+		// Consulta si el usuario esta registrado
 		Properties kafkaProps = new Properties();
 		
 		// Puede que broker2 no sea necesario
@@ -197,6 +183,21 @@ public class FWQ_Visitor {
 		// Se enviara asincronamente con send()
 		// topic = Alias, key = accion, value = info adicional a accion
 		enviarKafka(producer, AliasVisitor, "entrarSalir", "0");
+		//-----------//
+		// Conexion con BD para comprobar alias y password //
+		//-----------//
+		/*visitorExists = consultaEntrada(AliasVisitor, PWVisitor, skRegistro);
+		if (visitorExists) {
+			// El visitante existe, hay que comprobar el aforo
+
+		}
+		else {
+			// El visitante no existe, se notifica
+			System.out.println("El usuario y contrasenya introducidos no estan registrados");
+
+		}*/
+
+		
 
 		return resultado;
 	}

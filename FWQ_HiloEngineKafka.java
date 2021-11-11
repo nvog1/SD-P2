@@ -46,6 +46,9 @@ public class FWQ_HiloEngineKafka extends Thread {
     public boolean entrarSalir(String topic, String value) {
         boolean result = false;
 
+        if (value == "0") {
+            // El usuario quiere entrar al parque
+        }
         return result;
     }
 
