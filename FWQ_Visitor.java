@@ -73,7 +73,7 @@ public class FWQ_Visitor {
 	}
 
 	public String modificarDatos(String p_operacion, String p_resultado, String p_Cadena, Socket p_Socket_Con_Servidor) {
-		String Alias = "", nombre = "", contrasenya = "";
+		String Alias = "", contrasenya = "";
 		String nuevoNombre = "", nuevaContras = "";
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
