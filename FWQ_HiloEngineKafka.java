@@ -5,8 +5,13 @@ import java.io.*;
 import java.util.Properties;
 import java.util.*;
 import java.time.Duration;
+import java.sql.*;
 
 public class FWQ_HiloEngineKafka extends Thread {
+    private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
+
     private Properties ProducerProps = new Properties();
     private Properties ConsumerProps = new Properties();
     // hay que probar las 2 lineas siguientes
@@ -45,14 +50,14 @@ public class FWQ_HiloEngineKafka extends Thread {
 		consumer.subscribe(Collections.singletonList(groupID));
 	}*/
     
-    public boolean ConsultarUsuarioSQL(String Alias, String password) {
+    public boolean ConsultarUsuarioSQL(String Alias) {
         boolean resultado = false;
         
         try {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             Statement statement = connection.createStatement();
-            String sentence = "SELECT Contrasenya FROM Usuarios WHERE Alias = '" + Alias + "'";
+            String sentence = "SELECT * FROM Usuarios WHERE Alias = '" + Alias + "'";
             ResultSet result = statement.executeQuery(sentence);
             if (result.next()) {
                 // Algun usuario concuerda con los datos
@@ -82,8 +87,16 @@ public class FWQ_HiloEngineKafka extends Thread {
             System.out.println("El usuario " + topic + " quiere entrar al parque");
 
             // Comprobacion de que el usuario esta registrado
-
+            if (ConsultarUsuarioSQL(topic)) {
+                System.out.println("El usuario esta registrado.");
+                result = true;
+            }
+            else {
+                System.out.println("El usuario no esta registrado.");
+                result = false;
+            }
         }
+
         return result;
     }
 
@@ -95,7 +108,18 @@ public class FWQ_HiloEngineKafka extends Thread {
         System.out.println("Topic: " + topic + "; Key: " + key + "; Value: " + value);
         if (key == "entrarSalir") {
             // Se quiere entrar (value == "0") o salir (value == "1")
-            entrarSalir(topic, value);
+            if (entrarSalir(topic, value)) {
+                // El usuario esta registrado
+                ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, "entrar");
+
+                try {
+                    // Aqui hay un warning que podemos obviar
+                    producer.send(record, new DemoProducerCallback());
+                }
+                catch(Exception e) {
+                    System.out.println("Error: " + e.toString());
+                }
+            }
         }
     }
 
@@ -123,4 +147,14 @@ public class FWQ_HiloEngineKafka extends Thread {
             System.out.println("Error: " + e.toString());
         }
     }
+
+    
+	private static class DemoProducerCallback implements Callback {
+		@Override
+		public void onCompletion(RecordMetadata recordMetadata, Exception e){
+			if (e != null) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

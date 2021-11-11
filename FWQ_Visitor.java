@@ -133,26 +133,6 @@ public class FWQ_Visitor {
 		}
 	}
 
-	public boolean consultaEntrada(String AliasVisitor, String PWVisitor, Socket skRegistro) {
-		// Se comprueba si los datos estan registrados
-		boolean result = false;
-		String cadena = "";
-
-		cadena = "consultar;" + AliasVisitor + ";" + PWVisitor; 
-
-		escribeSocket(skRegistro, cadena);
-		cadena = "";
-		cadena = leeSocket(skRegistro, cadena);
-		if (cadena == "true") {
-			result = true;
-		}
-		else {
-			result = false;
-		}
-
-		return result;
-	}
-
 	public String entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
@@ -183,20 +163,17 @@ public class FWQ_Visitor {
 		// Se enviara asincronamente con send()
 		// topic = Alias, key = accion, value = info adicional a accion
 		enviarKafka(producer, AliasVisitor, "entrarSalir", "0");
-		//-----------//
-		// Conexion con BD para comprobar alias y password //
-		//-----------//
-		/*visitorExists = consultaEntrada(AliasVisitor, PWVisitor, skRegistro);
-		if (visitorExists) {
-			// El visitante existe, hay que comprobar el aforo
 
-		}
-		else {
-			// El visitante no existe, se notifica
-			System.out.println("El usuario y contrasenya introducidos no estan registrados");
+		// Consumer recibe la respuesta
+		this.ConsumerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
+        this.ConsumerProps.put("group.id", "Visitors");
+        this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-		}*/
-
+        consumer = new KafkaConsumer<String, String>(ConsumerProps);
+        // Suscribir el consumer a un topic
+		consumer.subscribe(Collections.singletonList("SD"));
+		recibirKafka();
 		
 
 		return resultado;
