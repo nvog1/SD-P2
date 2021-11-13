@@ -177,10 +177,6 @@ public class FWQ_Visitor {
 		AliasVisitor = br.readLine();
 		System.out.println("Introduzca su contrasenya: ");
 		PWVisitor = br.readLine();
-		}
-		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
-		}
 
 		// Consulta si el usuario esta registrado
 		Properties kafkaProps = new Properties();
@@ -193,6 +189,10 @@ public class FWQ_Visitor {
 		// Se enviara asincronamente con send()
 		// topic = Alias, key = accion, value = info adicional a accion
 		enviarKafka(producer, AliasVisitor, "entrarSalir", "0", p_QueueHandlerHost, p_QueueHandlerPort);		
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
 
 		return resultado;
 	}
@@ -279,7 +279,12 @@ public class FWQ_Visitor {
 					// El visitante quiere entrar o salir del parque
 					if (operacion == 3) {
 						// Se quiere entrar al parque
-						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
+						//--------------
+						//entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
+						//------------
+						System.out.println("Se va a crear un topic...");
+						KafkaTopic topic = new KafkaTopic(p_QueueHandlerHost, p_QueueHandlerPort, "TopicPrueba");
+						salir = 1;
 					}
 					else if (operacion == 4) {
 						escribeSocket(skRegistro, "fin");
