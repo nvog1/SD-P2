@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Properties;
+import java.util.*;
  
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.clients.consumer.*;
@@ -133,6 +134,13 @@ public class FWQ_Visitor {
 		}
 	}
 
+	public String recibirKafka() {
+		String result = "";
+
+
+		return result;
+	}
+
 	public String entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
@@ -164,15 +172,6 @@ public class FWQ_Visitor {
 		// topic = Alias, key = accion, value = info adicional a accion
 		enviarKafka(producer, AliasVisitor, "entrarSalir", "0");
 
-		// Consumer recibe la respuesta
-		this.ConsumerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
-        this.ConsumerProps.put("group.id", "Visitors");
-        this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-
-        consumer = new KafkaConsumer<String, String>(ConsumerProps);
-        // Suscribir el consumer a un topic
-		consumer.subscribe(Collections.singletonList("SD"));
 		recibirKafka();
 		
 
