@@ -114,28 +114,12 @@ public class FWQ_HiloServidorRegistro extends Thread {
 
     public String consultarSocket(String cadena) {
         // El caracter de separacion sera el punto y coma ';'
-        // Se guardara Alias/ID, Nombre y contrase�a
+        // Se guardara Alias/ID, Nombre y contrasenya
 
         String[] operacion = cadena.split(";");
         String result = "";
 
-        /*if (operacion[0] == "entrar") {
-            // Se quiere entrar al parque
-            System.out.println("Se comprobaran los datos del Alias: " + operacion[1] 
-                + " y constraseña: " + operacion[2]);
-
-            try {
-            //------------------//
-            // Conexion con la BD //
-            //------------------//
-
-            }
-            catch (Exception e) {
-                System.out.println("Error: " + e.toString());
-            }
-
-        }
-        else*/ if (operacion[0].equals("registrar")) {
+        if (operacion[0].equals("registrar")) {
             // Se quiere registrar un usuario
             System.out.println("Se registrara el usuario con Alias/ID: " + operacion[1]
                 + "; Nombre: " + operacion[2]

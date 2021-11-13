@@ -14,7 +14,6 @@ public class FWQ_HiloEngineKafka extends Thread {
 
     private Properties ProducerProps = new Properties();
     private Properties ConsumerProps = new Properties();
-    // hay que probar las 2 lineas siguientes
     private KafkaProducer<String, String> producer;
     private KafkaConsumer<String, String> consumer;
 
@@ -35,20 +34,6 @@ public class FWQ_HiloEngineKafka extends Thread {
         // Suscribir el consumer a un topic
 		consumer.subscribe(Collections.singletonList("SD"));
     }
-
-	// GroupID para diferenciar los topics? (en o'reilly trata el groupID como el topic)
-	/*public String leerKafka(String groupID) {
-		Properties props = new Properties();
-		props.put("bootstrap.servers", "broker1:9092");
-		props.put("group.id", groupID);
-		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-
-		KafkaConsumer<String,String> consumer = new KafkaConsumer<String, String>(props);
-
-		// Suscribir el consumer a un topic
-		consumer.subscribe(Collections.singletonList(groupID));
-	}*/
     
     public boolean ConsultarUsuarioSQL(String Alias) {
         boolean resultado = false;
