@@ -212,7 +212,7 @@ public class FWQ_Visitor {
 	}
 
 	// El visitante podra registrarse, modificar sus datos, entrar al parque, salir del parque...
-	public void pedirOperacion(String p_registryHost, String p_registryPort, String p_QueueHandlerHost, String p_QueueHandlerPort) {
+	public void pedirOperacion(String p_registryHost, String p_registryPort, String p_QueueHandlerHost, String p_QueueHandlerPort, String Topic) {
 		int operacion, salir = 0;
 		char resp;
 		String resultado = "";
@@ -286,11 +286,7 @@ public class FWQ_Visitor {
 					// El visitante quiere entrar o salir del parque
 					if (operacion == 3) {
 						// Se quiere entrar al parque
-						//--------------
-						//entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
-						//------------
-						System.out.println("Se va a crear un topic...");
-						KafkaTopic topic = new KafkaTopic(p_QueueHandlerHost, p_QueueHandlerPort, "TopicPrueba");
+						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
 						salir = 1;
 					}
 					else if (operacion == 4) {
@@ -315,7 +311,7 @@ public class FWQ_Visitor {
 	}
 
 	// El visitante podra hacer alguna actividad relacionada con el parque o salir
-	public void menu(String p_registryHost, String p_registryPort, String p_QueueHandlerHost, String p_QueueHandlerPort) {
+	public void menu(String p_registryHost, String p_registryPort, String p_QueueHandlerHost, String p_QueueHandlerPort, String Topic) {
 		int opcion = 0;
 
 		try {
@@ -329,7 +325,7 @@ public class FWQ_Visitor {
 			}
 			if (opcion == 1) {
 				// Se realiza alguna operacion
-				pedirOperacion(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort);
+				pedirOperacion(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort, Topic);
 			}
 			else {
 				System.exit(0);
@@ -348,6 +344,7 @@ public class FWQ_Visitor {
         String RegistryPort;
         String QueueHandlerHost;
         String QueueHandlerPort;
+		String Topic;
 		
         if (args.length < 4) {
             System.out.println("Se debe indicar la direccion y el puerto del registro" + 
@@ -360,9 +357,10 @@ public class FWQ_Visitor {
 		RegistryPort = args[1];
 		QueueHandlerHost = args[2];
 		QueueHandlerPort = args[3];
+		Topic = args[4];
 
 		while(i == 0) {
-			visitante.menu(RegistryHost, RegistryPort, QueueHandlerHost, QueueHandlerPort);
+			visitante.menu(RegistryHost, RegistryPort, QueueHandlerHost, QueueHandlerPort, Topic);
 		}
     }
 
