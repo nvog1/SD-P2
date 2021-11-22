@@ -48,21 +48,41 @@ public class WTSHiloKafka extends Thread {
 					//lógica del hilokafka	
 					//actualizo el valor "personas" en la bbdd
 					try{
-						BufferedReader bufrd = new BufferedReader(new FileReader("C:\kafka\SD-P2\atracciones.txt"));
-						String line = bufrd.readLine();
-						while(line != null){
-							String[] items = line.split(";");
-							if(items[0] == record.key()){
-								//escribir la línea con personas = record.value() (crear una lista de string con las atracciones para luego escribirlas)
+						BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
+						List<String> atracciones = new ArrayList<String>();
+						String atraccion = bufrd.readLine();
+						while(atraccion != null){
+							String[] items = atraccion.split(";");
+							//DEBUG
+							System.out.println("items[0] = " + items[0] + " record.key() = " + record.key());
+							//DEBUG
+							if(Integer.parseInt(items[0]) == Integer.parseInt(record.key())){//si es la que nos ha llegado, actualizamos las personas
+								//DEBUG
+								System.out.println("coincide");
+								//DEBUG
+								items[1] = record.value();
+								atraccion = items[0] + ";" + items[1] + ";" + items[2] + ";" + items[3] + ";" + items[4];
 							}
+							//DEBUG
+							System.out.println("Atracción: " + atraccion);
+							//DEBUG
+							atracciones.add(atraccion);
+							atraccion = bufrd.readLine();
+						}
 
-							line = bufrd.readLine();
+						//reescribo el fichero
+						try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\SD-P2\\atracciones.txt"))) {
+							for(String linea: atracciones){
+								bufferedWriter.write(linea + "\n");
+							}
+						}
+						catch (Exception e) {
+							System.out.println("Error: " + e.toString());
 						}
 					}
 					catch(Exception e){
-						System.out.println("Error: " + e.message);
+						System.out.println("Error: " + e.toString());
 					}
-
 				}
 			}
 		}
@@ -70,7 +90,6 @@ public class WTSHiloKafka extends Thread {
 			System.out.println("Exception: " + e.toString());
 		}
 	}
-
 }
 
 
