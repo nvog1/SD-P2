@@ -260,7 +260,7 @@ public class FWQ_Engine {
 			ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto_wts));
 
 			// Hilo de kafka
-			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker);
+			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
 			tKafka.start();
 
 			// Hilo de Sockets

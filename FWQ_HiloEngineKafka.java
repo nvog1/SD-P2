@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.sql.*;
 
 public class FWQ_HiloEngineKafka extends Thread {
+    private int maxVisitantes;
+
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
@@ -18,7 +20,9 @@ public class FWQ_HiloEngineKafka extends Thread {
     private KafkaConsumer<String, String> consumer;
 
 
-    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker) {
+    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, int aforo) {
+        maxVisitantes = aforo;
+
         this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
         this.ProducerProps.put("value.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
@@ -63,25 +67,58 @@ public class FWQ_HiloEngineKafka extends Thread {
         return resultado;
     }
 
+    public Integer consultarNumUsuSQL() {
+        Integer resultado = -1;
+
+        /*try {
+            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            
+            Statement statement = connection.createStatement();
+            String sentence = "SELECT * FROM Usuarios");
+            ResultSet result = statement.executeQuery(sentence);
+            resultado = result.last().getRow();
+        }
+        catch (Exception e) {
+            System.out.println("Error SQL: " + e.getMessage());
+        }*/
+
+        return resultado;
+    }
+
     // Comprueba si el Alias/ID esta registrado
     public boolean entrarSalir(String topic, String value) {
-        boolean result = false;
+        Boolean op1 = false, op2 = false;
+        Boolean result = false;
+        String[] vectorResultados = value.split(";");
 
-        if (value == "0") {
+        if (vectorResultados[0] == "entrar") {
             // El usuario quiere entrar al parque
-            System.out.println("El usuario " + topic + " quiere entrar al parque");
+            System.out.println("El usuario " + vectorResultados[1] + " quiere entrar al parque");
 
             // Comprobacion de que el usuario esta registrado
-            if (ConsultarUsuarioSQL(topic)) {
+            if (ConsultarUsuarioSQL(vectorResultados[1])) {
                 System.out.println("El usuario esta registrado.");
-                result = true;
+                op1 = true;
             }
             else {
                 System.out.println("El usuario no esta registrado.");
-                result = false;
+                op1 = false;
+            }
+
+            // TODO: Consultar aforo del parque
+            if (consultarNumUsuSQL() > maxVisitantes) {
+                // Se ha alcanzado el numero maximo de visitantes
+                System.out.println("Se ha alcanzado el aforo maximo");
+                op2 = false;
+            }
+            else {
+                // Cabe mas gente
+                System.out.println("El aforo del parque acepta al visitante");
+                op2 = true;
             }
         }
 
+        result = (op1 && op2);
         return result;
     }
 
