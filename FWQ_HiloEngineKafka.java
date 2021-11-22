@@ -36,7 +36,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 
         consumer = new KafkaConsumer<String, String>(ConsumerProps);
         // Suscribir el consumer a un topic
-		consumer.subscribe(Collections.singletonList("SD"));
+		consumer.subscribe(Collections.singletonList("Visitor"));
     }
     
     public boolean ConsultarUsuarioSQL(String Alias) {
