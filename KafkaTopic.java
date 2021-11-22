@@ -8,24 +8,31 @@ import java.util.concurrent.ExecutionException;
 import java.util.*;
 
 public class KafkaTopic {
-    public KafkaTopic (String ipBroker, String puertoBroker, String nombreTopic) {
-        
+    public KafkaTopic (String ipBroker, String puertoBroker, String nombreTopic, String groupID) {
+
         try {
             Properties props = new Properties();
-            props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, ipBroker + ":" + puertoBroker);
+            props.put("bootstrap.servers",  ipBroker + ":" + puertoBroker);
+            props.put("group.id", groupID);
+            props.put("enable.auto.commit", "true");
+            props.put("auto.commit.interval.ms", "1000");
+            props.put("key.deserializer" , "org.apache.kafka.common.serialization.StringDeserializer");
+            props.put("value.deserializer", "   org.apache.kafka.common.serialization.StringDeserializer");
+            //props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, ipBroker + ":" + puertoBroker);
             AdminClient admin = AdminClient.create(props);
 
             // Creando el nuevo topic
-            NewTopic topic = new NewTopic(nombreTopic, 1, (short) 1);
-            List<NewTopic> newTopics = new ArrayList<topic>();
-            newTopics.add(newTopic);
-            adminClient.createTopics(newTopic);
+            NewTopic topic = new NewTopic(nombreTopic, 1, (short)1);
+            List<NewTopic> newTopics = new ArrayList<NewTopic>();
+            newTopics.add(topic);
+            admin.createTopics(newTopics);
             //admin.createTopics(Collections.singleton(topic));
             System.out.println("Topic creado.");
 
             // Listar los topics existentes
             System.out.println("Topics listados: ");
             admin.listTopics().names().get().forEach(System.out::println);
+            admin.close();
         }
         catch (Exception e) {
             System.out.println("Error: " + e.toString());

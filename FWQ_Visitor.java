@@ -144,6 +144,7 @@ public class FWQ_Visitor {
 		try {
 			KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(ConsumerProps);
 			// Suscribir el consumer a un topic
+			// TODO: En vez de "SD" poner "mapaX" (variable pasada por parametro al ejecutar la instruccion)
 			consumer.subscribe(Collections.singletonList("SD"));
 			Duration timeout = Duration.ofMillis(100);
 			boolean continuar = true;
@@ -194,8 +195,10 @@ public class FWQ_Visitor {
 
 		KafkaProducer producer = new KafkaProducer<String, String>(kafkaProps);
 		// Se enviara asincronamente con send()
+		// topic = "Visitor", key = "entrarSalir", value = "entrar;Alias"
+		enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor, p_QueueHandlerHost, p_QueueHandlerPort);
 		// topic = Alias, key = accion, value = info adicional a accion
-		enviarKafka(producer, AliasVisitor, "entrarSalir", "0", p_QueueHandlerHost, p_QueueHandlerPort);		
+		//enviarKafka(producer, AliasVisitor, "entrarSalir", "0", p_QueueHandlerHost, p_QueueHandlerPort);		
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
@@ -286,12 +289,10 @@ public class FWQ_Visitor {
 					// El visitante quiere entrar o salir del parque
 					if (operacion == 3) {
 						// Se quiere entrar al parque
-						//--------------
-						//entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
-						//------------
-						System.out.println("Se va a crear un topic...");
-						KafkaTopic topic = new KafkaTopic(p_QueueHandlerHost, p_QueueHandlerPort, "TopicPrueba");
-						salir = 1;
+						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
+						/*System.out.println("Se va a crear un topic...");
+						KafkaTopic topic = new KafkaTopic(p_QueueHandlerHost, p_QueueHandlerPort, "TopicPrueba", "Visitor");
+						salir = 1;*/
 					}
 					else if (operacion == 4) {
 						escribeSocket(skRegistro, "fin");
