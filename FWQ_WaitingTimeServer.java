@@ -15,7 +15,7 @@ public class FWQ_WaitingTimeServer {
 		try
 		{
 			if (args.length < 3) {
-				System.out.println("Indica el puerto de escucha y la ip y puerto del broker(puerto puerto_broker ip_broker)");
+				System.out.println("Indica el puerto de escucha y la ip y puerto del broker(puerto ip_broker puerto_broker)");
 				System.exit(1);
 			}
 			puerto = args[0];
