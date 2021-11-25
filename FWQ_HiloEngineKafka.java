@@ -68,19 +68,20 @@ public class FWQ_HiloEngineKafka extends Thread {
     }
 
     public Integer consultarNumUsuSQL() {
-        Integer resultado = -1;
+        Integer resultado = 0;
 
-        /*try {
-            Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
-            
-            Statement statement = connection.createStatement();
-            String sentence = "SELECT * FROM Usuarios");
-            ResultSet result = statement.executeQuery(sentence);
-            resultado = result.last().getRow();
-        }
-        catch (Exception e) {
-            System.out.println("Error SQL: " + e.getMessage());
-        }*/
+        try {
+			Connection connection =  DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT * from FWQ_BBDD.Mapa");
+			// Se procesan los resultados obtenidos y modifica el alias
+			while (result.next()) {
+				resultado++;
+			}
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e.toString());
+		}
 
         return resultado;
     }
@@ -105,7 +106,6 @@ public class FWQ_HiloEngineKafka extends Thread {
                 op1 = false;
             }
 
-            // TODO: Consultar aforo del parque
             if (consultarNumUsuSQL() > maxVisitantes) {
                 // Se ha alcanzado el numero maximo de visitantes
                 System.out.println("Se ha alcanzado el aforo maximo");
@@ -131,7 +131,7 @@ public class FWQ_HiloEngineKafka extends Thread {
         if (key == "entrarSalir") {
             // Se quiere entrar (value == "0") o salir (value == "1")
             if (entrarSalir(topic, value)) {
-                // El usuario esta registrado
+                // El usuario esta registrado y cabe en el parque (no supera aforo)
                 ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, "entrar");
 
                 try {
@@ -156,6 +156,7 @@ public class FWQ_HiloEngineKafka extends Thread {
                 ConsumerRecords<String, String> records = consumer.poll(timeout);
 
                 for (ConsumerRecord<String, String> record : records) {
+                    System.out.println("Se asignaran las variables recibidas por kafka");
                     // Asignamos las variables
                     topic = record.topic();
                     key = record.key();

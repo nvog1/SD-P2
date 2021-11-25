@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.clients.consumer.*;
 
 public class FWQ_Visitor {
+	private static String topicConsumer;
 
     public String leeSocket (Socket p_sk, String p_Datos)
 	{
@@ -128,7 +129,7 @@ public class FWQ_Visitor {
 
 		try {
 			// Aqui hay un warning que podemos obviar
-			producer.send(record, new DemoProducerCallback());
+			producer.send(record/*, new DemoProducerCallback()*/);
 		}
 		catch(Exception e) {
 			System.out.println("Error: " + e.toString());
@@ -145,7 +146,7 @@ public class FWQ_Visitor {
 			KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(ConsumerProps);
 			// Suscribir el consumer a un topic
 			// TODO: En vez de "SD" poner "mapaX" (variable pasada por parametro al ejecutar la instruccion)
-			consumer.subscribe(Collections.singletonList("SD"));
+			consumer.subscribe(Collections.singletonList(topicConsumer));
 			Duration timeout = Duration.ofMillis(100);
 			boolean continuar = true;
 
@@ -350,30 +351,30 @@ public class FWQ_Visitor {
         String QueueHandlerHost;
         String QueueHandlerPort;
 		
-        if (args.length < 4) {
+        if (args.length < 5) {
             System.out.println("Se debe indicar la direccion y el puerto del registro" + 
             " y del gestor de colas");
             System.out.println("$./FWQ_Visitor host_registro puerto_registro " + 
-			"host_gestorColas puerto_gestorColas");
+			"host_gestorColas puerto_gestorColas topicConsumer");
 			System.exit(-1);
         }
 		RegistryHost = args[0];
 		RegistryPort = args[1];
 		QueueHandlerHost = args[2];
 		QueueHandlerPort = args[3];
+		topicConsumer = args[4];
 
 		while(i == 0) {
 			visitante.menu(RegistryHost, RegistryPort, QueueHandlerHost, QueueHandlerPort);
 		}
     }
 
-	private static class DemoProducerCallback implements Callback {
+	/*private static class DemoProducerCallback implements Callback {
 		@Override
 		public void onCompletion(RecordMetadata recordMetadata, Exception e){
 			if (e != null) {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 }
-
