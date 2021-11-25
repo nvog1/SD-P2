@@ -9,6 +9,10 @@ import org.apache.kafka.clients.consumer.*;
 
 public class FWQ_Visitor {
 	private static String topicConsumer;
+	private String posicionActual = "";
+	private String atraccionObjetivo;
+	private Properties ProducerProps = new Properties();
+	private Properties ConsumerProps = new Properties();
 
     public String leeSocket (Socket p_sk, String p_Datos)
 	{
@@ -123,9 +127,44 @@ public class FWQ_Visitor {
 		return p_resultado;
 	}
 
+	public String proximoMov() {
+		String result = "";
+
+		Integer num = Math.random()*8 + 1;
+		// Norte = 1; Noreste = 2; Este = 3; Sureste = 4; 
+		// Sur = 5; Suroeste = 6; Oeste = 7; Noroeste = 8
+		result = num.toString();
+
+		return result;
+	}
+
+	public void dentroParque() {
+		char resp;
+		String mov = "";
+
+		// El visitor ya ha entrado al parque, se aplicará la lógica
+		if (posicionActual.equals("")) {
+			// Se elige una posicion aleatoria
+			int posX = Math.random()*20;
+			int posY = Math.random()*20;
+			posicionActual = posX + ";" + posY;
+		}
+		else {
+			// Ya tiene una posicion asignada
+			// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
+			while (resp != 's') {
+				mov = proximoMov();
+				//------AQUI------//
+				enviarKafka(producer, TopicConsumer, key, value, p_QueueHandlerHost, p_QueueHandlerPort);
+
+			}
+		}
+	}
+
 	public void enviarKafka(KafkaProducer producer, String TopicConsumer, String key, String value, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		// Preguntar construccion del mensage con el topic (topic, key, value)
 		ProducerRecord<String, String> record = new ProducerRecord<>(TopicConsumer, key, value);
+		Boolean entrar = false;
 
 		try {
 			// Aqui hay un warning que podemos obviar
@@ -136,7 +175,6 @@ public class FWQ_Visitor {
 		}
 
 		// Visitor recibe la respuesta como consumer
-		Properties ConsumerProps = new Properties();
 		ConsumerProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
         ConsumerProps.put("group.id", "Visitors");
         ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
@@ -156,9 +194,14 @@ public class FWQ_Visitor {
 				for (ConsumerRecord<String, String> consumerRecord : records) {
 					if (consumerRecord.value().equals("entrar")) {
 						System.out.println("El usuario puede entrar");
+						entrar = true;
 						continuar = false;
 					}
 				}
+			}
+
+			if (entrar) {
+				dentroParque();
 			}
 		}
 		catch (Exception e) {
@@ -188,16 +231,15 @@ public class FWQ_Visitor {
 			PWVisitor = br.readLine();
 
 			// Consulta si el usuario esta registrado
-			Properties kafkaProps = new Properties();
 			
-			kafkaProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
-			kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
-			kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+			ProducerProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
+			ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
+			ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
-			KafkaProducer producer = new KafkaProducer<String, String>(kafkaProps);
+			KafkaProducer producer = new KafkaProducer<String, String>(ProducerProps);
 			// Se enviara asincronamente con send()
 			// topic = "Visitor", key = "entrarSalir", value = "entrar;Alias"
-			enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor, p_QueueHandlerHost, p_QueueHandlerPort);
+			enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor + ";" + topicConsumer, p_QueueHandlerHost, p_QueueHandlerPort);
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
@@ -292,14 +334,16 @@ public class FWQ_Visitor {
 						salir = 1;
 					}
 					else if (operacion == 4) {
-						escribeSocket(skRegistro, "fin");
+						// TODO implementar salirParque
+						salirParque(op,resutado, p_QueueHandlerHost, p_QueueHandlerPort);
+						/*escribeSocket(skRegistro, "fin");
 						cadena = leeSocket(skRegistro, cadena);
 						if (cadena == "fin") {
 							skRegistro.close();
 							System.out.println("Conexion cerrada");
 							System.exit(0);
 						}
-						System.out.println("Saliendo del parque...");
+						System.out.println("Saliendo del parque...");*/
 						salir = 1;
 					}
 				}
@@ -327,7 +371,7 @@ public class FWQ_Visitor {
 			}
 			if (opcion == 1) {
 				// Se realiza alguna operacion
-				pedirOperacion(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort, Topic);
+				pedirOperacion(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort);
 			}
 			else {
 				System.exit(0);
