@@ -155,7 +155,7 @@ public class FWQ_Visitor {
 			while (resp != 's') {
 				mov = proximoMov();
 				//------AQUI------//
-				enviarKafka(producer, TopicConsumer, key, value, p_QueueHandlerHost, p_QueueHandlerPort);
+				//enviarKafka(producer, TopicConsumer, key, value, p_QueueHandlerHost, p_QueueHandlerPort);
 
 			}
 		}
@@ -335,7 +335,7 @@ public class FWQ_Visitor {
 					}
 					else if (operacion == 4) {
 						// TODO implementar salirParque
-						salirParque(op,resutado, p_QueueHandlerHost, p_QueueHandlerPort);
+						//salirParque(op,resutado, p_QueueHandlerHost, p_QueueHandlerPort);
 						/*escribeSocket(skRegistro, "fin");
 						cadena = leeSocket(skRegistro, cadena);
 						if (cadena == "fin") {
