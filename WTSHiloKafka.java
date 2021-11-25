@@ -41,9 +41,6 @@ public class WTSHiloKafka extends Thread {
 
 				for (ConsumerRecord<String, Integer> record : records) {
 
-					//TEST
-					System.out.printf("Atracción: %s; personas = %d\n", record.key(), record.value());
-					//TEST
 
 					//lógica del hilokafka	
 					//actualizo el valor "personas" en la bbdd
@@ -53,21 +50,11 @@ public class WTSHiloKafka extends Thread {
 						String atraccion = bufrd.readLine();
 						while(atraccion != null){
 							String[] items = atraccion.split(";");
-							//DEBUG
-							System.out.println("items[0] = " + items[0] + " record.key() = " + record.key());
-							//DEBUG
 							if(Integer.parseInt(items[0]) == Integer.parseInt(record.key())){//si es la que nos ha llegado, actualizamos las personas
-								//DEBUG
-								System.out.println("coincide");
-								//DEBUG
-								//Integer aux = record.value();
 								items[1] = record.value().toString();
-								//items[1] = record.value();
 								atraccion = items[0] + ";" + items[1] + ";" + items[2] + ";" + items[3] + ";" + items[4];
 							}
-							//DEBUG
-							System.out.println("Atracción: " + atraccion);
-							//DEBUG
+
 							atracciones.add(atraccion);
 							atraccion = bufrd.readLine();
 						}
