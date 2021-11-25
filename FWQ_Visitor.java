@@ -123,9 +123,9 @@ public class FWQ_Visitor {
 		return p_resultado;
 	}
 
-	public void enviarKafka(KafkaProducer producer, String topic, String key, String value, String p_QueueHandlerHost, String p_QueueHandlerPort) {
+	public void enviarKafka(KafkaProducer producer, String TopicConsumer, String key, String value, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		// Preguntar construccion del mensage con el topic (topic, key, value)
-		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+		ProducerRecord<String, String> record = new ProducerRecord<>(TopicConsumer, key, value);
 
 		try {
 			// Aqui hay un warning que podemos obviar
@@ -135,7 +135,7 @@ public class FWQ_Visitor {
 			System.out.println("Error: " + e.toString());
 		}
 
-		// Consumer recibe la respuesta
+		// Visitor recibe la respuesta como consumer
 		Properties ConsumerProps = new Properties();
 		ConsumerProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
         ConsumerProps.put("group.id", "Visitors");
@@ -182,24 +182,22 @@ public class FWQ_Visitor {
 		BufferedReader br = new BufferedReader(isr);
 
 		try {
-		System.out.println("Introduzca su Alias/ID: ");
-		AliasVisitor = br.readLine();
-		System.out.println("Introduzca su contrasenya: ");
-		PWVisitor = br.readLine();
+			System.out.println("Introduzca su Alias/ID: ");
+			AliasVisitor = br.readLine();
+			System.out.println("Introduzca su contrasenya: ");
+			PWVisitor = br.readLine();
 
-		// Consulta si el usuario esta registrado
-		Properties kafkaProps = new Properties();
-		
-		kafkaProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
-		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
-		kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+			// Consulta si el usuario esta registrado
+			Properties kafkaProps = new Properties();
+			
+			kafkaProps.put("bootstrap.servers", p_QueueHandlerHost + ":" + p_QueueHandlerPort);
+			kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
+			kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
-		KafkaProducer producer = new KafkaProducer<String, String>(kafkaProps);
-		// Se enviara asincronamente con send()
-		// topic = "Visitor", key = "entrarSalir", value = "entrar;Alias"
-		enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor, p_QueueHandlerHost, p_QueueHandlerPort);
-		// topic = Alias, key = accion, value = info adicional a accion
-		//enviarKafka(producer, AliasVisitor, "entrarSalir", "0", p_QueueHandlerHost, p_QueueHandlerPort);		
+			KafkaProducer producer = new KafkaProducer<String, String>(kafkaProps);
+			// Se enviara asincronamente con send()
+			// topic = "Visitor", key = "entrarSalir", value = "entrar;Alias"
+			enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor, p_QueueHandlerHost, p_QueueHandlerPort);
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
@@ -291,9 +289,7 @@ public class FWQ_Visitor {
 					if (operacion == 3) {
 						// Se quiere entrar al parque
 						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
-						/*System.out.println("Se va a crear un topic...");
-						KafkaTopic topic = new KafkaTopic(p_QueueHandlerHost, p_QueueHandlerPort, "TopicPrueba", "Visitor");
-						salir = 1;*/
+						salir = 1;
 					}
 					else if (operacion == 4) {
 						escribeSocket(skRegistro, "fin");
@@ -331,7 +327,7 @@ public class FWQ_Visitor {
 			}
 			if (opcion == 1) {
 				// Se realiza alguna operacion
-				pedirOperacion(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort);
+				pedirOperacion(p_registryHost, p_registryPort, p_QueueHandlerHost, p_QueueHandlerPort, Topic);
 			}
 			else {
 				System.exit(0);
