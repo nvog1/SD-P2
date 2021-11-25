@@ -23,14 +23,17 @@ public class FWQ_Sensor {
 
 	Runnable envioKafka = new Runnable() {
 		public void run() {
-			ProducerRecord<String, Integer> record = new ProducerRecord<>("Sensores", id ,personas);
+			//revisar simulación llegada para hacerla más realista
+			Random rd = new Random();
+			personas = rd.nextInt(50);
+			ProducerRecord<String, Integer> record = new ProducerRecord<>("Sensores", id, personas);
 			try {
 				producer.send(record);
+				System.out.println("Atracción " + id + ": " + personas);
 			} 
 			catch (Exception e) {
 				e.printStackTrace();
 			}
-			//lógica de enviar mensaje a kafka
 		}
 	};
 
