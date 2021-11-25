@@ -129,8 +129,9 @@ public class FWQ_Visitor {
 
 	public String proximoMov() {
 		String result = "";
+		Random rd = new Random();
 
-		Integer num = Math.random()*8 + 1;
+		Integer num = rd.nextInt(8) + 1;
 		// Norte = 1; Noreste = 2; Este = 3; Sureste = 4; 
 		// Sur = 5; Suroeste = 6; Oeste = 7; Noroeste = 8
 		result = num.toString();
@@ -139,14 +140,15 @@ public class FWQ_Visitor {
 	}
 
 	public void dentroParque() {
-		char resp;
+		char resp = '0';
 		String mov = "";
+		Random rd = new Random();
 
 		// El visitor ya ha entrado al parque, se aplicará la lógica
 		if (posicionActual.equals("")) {
 			// Se elige una posicion aleatoria
-			int posX = Math.random()*20;
-			int posY = Math.random()*20;
+			int posX = rd.nextInt(20);
+			int posY = rd.nextInt(20);
 			posicionActual = posX + ";" + posY;
 		}
 		else {
