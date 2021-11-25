@@ -30,16 +30,16 @@ public class WTSHiloKafka extends Thread {
 
 		
 		
-			KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+			KafkaConsumer<String, Integer> consumer = new KafkaConsumer<String, Integer>(props);
 
 			consumer.subscribe(Collections.singletonList("Sensores"));
 
 			Duration timeout = Duration.ofMillis(100);
 
 			while (true) {
-				ConsumerRecords<String, String> records = consumer.poll(timeout);
+				ConsumerRecords<String, Integer> records = consumer.poll(timeout);
 
-				for (ConsumerRecord<String, String> record : records) {
+				for (ConsumerRecord<String, Integer> record : records) {
 
 					//TEST
 					System.out.printf("Atracción: %s; personas = %d\n", record.key(), record.value());
@@ -60,7 +60,9 @@ public class WTSHiloKafka extends Thread {
 								//DEBUG
 								System.out.println("coincide");
 								//DEBUG
-								items[1] = record.value();
+								//Integer aux = record.value();
+								items[1] = record.value().toString();
+								//items[1] = record.value();
 								atraccion = items[0] + ";" + items[1] + ";" + items[2] + ";" + items[3] + ";" + items[4];
 							}
 							//DEBUG
