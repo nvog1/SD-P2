@@ -65,7 +65,7 @@ public class WTSHiloSck extends Thread{
 					while(atraccion != null){
 						String[] items = atraccion.split(";");
 						// tiempoEspera = (personas / personasCiclo) * tiempoCiclo
-						float tiempoEspera = (Integer.parseInt(items[1]) / Integer.parseInt(items[2]) ) * Integer.parseInt(items[3])
+						float tiempoEspera = (Integer.parseInt(items[1]) / Integer.parseInt(items[2]) ) * Integer.parseInt(items[3]);
 						atraccion = items[0] + ";" + tiempoEspera.toString();
 
 						atracciones.add(atraccion);
