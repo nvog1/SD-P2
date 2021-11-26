@@ -17,6 +17,7 @@ public class FWQ_Engine {
     private static final String PASSWORD = "1234";
 	private static String ipWTS;
 	private static Integer puertoWTS;
+	private static String atracciones;
 
 
 	/*
@@ -228,6 +229,7 @@ public class FWQ_Engine {
 			try{
 				Socket skCliente = new Socket(FWQ_Engine.ipWTS, FWQ_Engine.puertoWTS);
 				mensaje = leeSocket(skCliente, mensaje);
+				FWQ_Engine.atracciones = mensaje;
 			}
 			catch(Exception e){
 				System.out.println("Error: " + e.toString());

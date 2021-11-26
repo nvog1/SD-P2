@@ -52,7 +52,7 @@ public class WTSHiloKafka extends Thread {
 							String[] items = atraccion.split(";");
 							if(Integer.parseInt(items[0]) == Integer.parseInt(record.key())){//si es la que nos ha llegado, actualizamos las personas
 								items[1] = record.value().toString();
-								atraccion = items[0] + ";" + items[1] + ";" + items[2] + ";" + items[3] + ";" + items[4];
+								atraccion = items[0] + ";" + items[1] + ";" + items[2] + ";" + items[3] + ";" + items[4] + ";" + items[5] + ";" + items[6];
 							}
 
 							atracciones.add(atraccion);
