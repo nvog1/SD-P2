@@ -9,11 +9,14 @@ import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class FWQ_Engine {
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/fwq_bbdd?useSSL=false";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
+	private static String ipWTS;
+	private static Integer puertoWTS;
 
 
 	/*
@@ -218,6 +221,25 @@ public class FWQ_Engine {
 		return resultado;
 	}
 
+	//hilo que hace request al WTS para saber el estado de las atracciones
+	Runnable sckRequest = new Runnable() {
+		public void run() {
+			String mensaje = "";
+			try{
+				Socket skCliente = new Socket(FWQ_Engine.ipWTS, FWQ_Engine.puertoWTS);
+				mensaje = leeSocket(skCliente, mensaje);
+			}
+			catch(Exception e){
+				System.out.println("Error: " + e.toString());
+			}
+
+			//DEBUG
+			System.out.println(mensaje);
+			//DEBUG
+			
+		}
+	};
+
 	/**
 	 * @param args
 	 */
@@ -231,16 +253,16 @@ public class FWQ_Engine {
 			}
 			String ip_broker = "";
 			String puerto_broker = "";
-			String ip_wts = "";
-			String puerto_wts = "";
+			//String ip_wts = "";
+			//String puerto_wts = "";
 			int maxVisitantes = -1;
 			int segundos = -1; //segundos de espera entre peticiones al wts
 
 			ip_broker = args[0];
 			puerto_broker = args[1];
-			ip_wts = args[2];
-			puerto_wts = args[3];
+			FWQ_Engine.ipWTS = args[2];
 			try{
+				FWQ_Engine.puertoWTS = Integer.parseInt(args[3]);
 				maxVisitantes = Integer.parseInt(args[4]);
 				segundos = Integer.parseInt(args[5]);
 			}
@@ -249,47 +271,16 @@ public class FWQ_Engine {
 			}
 			
 
-			//conexion a kafka
-			//seguramente un thread, a�n no s� c�mo va kafka
-			//tener en cuenta que este hilo va a estar durmiendo 3 segundos
-			//cada vez que pida info al WTS
+			// Hilo de kafka
+			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
+			tKafka.start();
 
 			//conexion a wts
-
-			String mensaje = "";
-			ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto_wts));
+			FWQ_Engine engine = new FWQ_Engine();
 
 			// Hilo de Sockets
-			for(;;){
-				Socket skCLiente = skServidor.accept();
-				System.out.println("Sirviendo cliente...");
-
-				Thread tSocket = new FWQ_HiloEngineSocket(skCLiente);
-				tSocket.start();
-				
-				// Hilo de kafka
-				Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
-				tKafka.start();
-				/*try{
-					FWQ_Engine engine = new FWQ_Engine();
-					Socket clientSocket = new Socket(ip_wts, Integer.parseInt(puerto_wts));
-					mensaje = "1";
-					engine.escribeSocket(clientSocket, mensaje);
-					mensaje = "";
-					mensaje = engine.leeSocket(clientSocket, mensaje);
-					//procesar mensaje
-					clientSocket.close();
-					System.out.println("Conexi�n cerrada.");
-					Thread.sleep(segundos * 1000); //el tiempo lo pide en ms
-				}
-				catch(Exception e)
-				{
-					System.out.println("Error: " + e.toString());
-				}*/
-
-			}
-
-
+			ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+			executor.scheduleAtFixedRate(engine.sckRequest, 0, segundos, TimeUnit.SECONDS);
 		}
 		catch(Exception e)
 		{

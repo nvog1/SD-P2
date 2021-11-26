@@ -5,6 +5,7 @@ import java.lang.Exception;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
+import java.util.*;
 
 public class WTSHiloSck extends Thread{
 	
@@ -66,14 +67,14 @@ public class WTSHiloSck extends Thread{
 						String[] items = atraccion.split(";");
 						// tiempoEspera = (personas / personasCiclo) * tiempoCiclo
 						float tiempoEspera = (Integer.parseInt(items[1]) / Integer.parseInt(items[2]) ) * Integer.parseInt(items[3]);
-						atraccion = items[0] + ";" + tiempoEspera.toString();
+						atraccion = items[0] + ";" + tiempoEspera;
 
 						atracciones.add(atraccion);
 						atraccion = bufrd.readLine();
 					}
 
 					//envío la info
-					String mensaje;
+					String mensaje = "";
 					for(String linea: atracciones){
 						mensaje += linea + "\n";
 					}
