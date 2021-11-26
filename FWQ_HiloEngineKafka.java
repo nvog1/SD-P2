@@ -317,6 +317,7 @@ public class FWQ_HiloEngineKafka extends Thread {
         try {
             // Bucle de escucha kafka
             while (continuar) {
+				System.out.println("Entro al bucle de Kafka");
                 ConsumerRecords<String, String> records = consumer.poll(timeout);
 
                 for (ConsumerRecord<String, String> record : records) {
