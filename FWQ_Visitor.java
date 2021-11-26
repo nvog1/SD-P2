@@ -163,11 +163,12 @@ public class FWQ_Visitor {
 		}
 	}
 
-	public void enviarKafka(KafkaProducer producer, String TopicConsumer, String key, String value, String p_QueueHandlerHost, String p_QueueHandlerPort) {
+	public void enviarKafka(KafkaProducer producer, String TopicProducer, String key, String value, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		// Preguntar construccion del mensage con el topic (topic, key, value)
-		ProducerRecord<String, String> record = new ProducerRecord<>(TopicConsumer, key, value);
+		ProducerRecord<String, String> record = new ProducerRecord<>(TopicProducer, key, value);
 		Boolean entrar = false;
 
+		System.out.println("Se va a enviar el mensaje de Kafka");
 		try {
 			// Aqui hay un warning que podemos obviar
 			producer.send(record/*, new DemoProducerCallback()*/);

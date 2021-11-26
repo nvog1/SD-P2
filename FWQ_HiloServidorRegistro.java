@@ -1,5 +1,6 @@
 import java.lang.Exception;
 import java.net.Socket;
+import java.net.SocketException;
 import java.io.*;
 import java.sql.*;
 
@@ -168,6 +169,9 @@ public class FWQ_HiloServidorRegistro extends Thread {
                 this.escribeSocket(skCliente, cadena);
             }
             skCliente.close();
+        }
+        catch (SocketException e) {
+            System.out.println("Error: El visitante se ha desconectado");
         }
         catch (Exception e) {
             System.out.println("Error: " + e.toString());

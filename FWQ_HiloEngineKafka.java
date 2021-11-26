@@ -317,10 +317,11 @@ public class FWQ_HiloEngineKafka extends Thread {
         try {
             // Bucle de escucha kafka
             while (continuar) {
-				System.out.println("Entro al bucle de Kafka");
                 ConsumerRecords<String, String> records = consumer.poll(timeout);
 
+				System.out.println("Despues del poll");
                 for (ConsumerRecord<String, String> record : records) {
+					System.out.println("Entro al bucle de records");
                     System.out.println("Se asignaran las variables recibidas por kafka");
                     // Asignamos las variables
                     topic = record.topic();

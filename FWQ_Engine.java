@@ -258,6 +258,10 @@ public class FWQ_Engine {
 
 			String mensaje = "";
 			ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto_wts));
+				
+			// Hilo de kafka
+			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
+			tKafka.start();
 
 			// Hilo de Sockets
 			for(;;){
@@ -266,10 +270,6 @@ public class FWQ_Engine {
 
 				Thread tSocket = new FWQ_HiloEngineSocket(skCLiente);
 				tSocket.start();
-				
-				// Hilo de kafka
-				Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
-				tKafka.start();
 				/*try{
 					FWQ_Engine engine = new FWQ_Engine();
 					Socket clientSocket = new Socket(ip_wts, Integer.parseInt(puerto_wts));
