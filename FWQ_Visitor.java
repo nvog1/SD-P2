@@ -235,6 +235,8 @@ public class FWQ_Visitor {
 		String AliasVisitor = "";
 		String PWVisitor = "";
 		boolean visitorExists = false;
+		//NICO: no puedes saber que topicConsumer no sea null(si no se ha registrado, por ejemplo)
+		//NICO: aliasVisitor contendrá ""
 		String topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer;
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
@@ -264,7 +266,7 @@ public class FWQ_Visitor {
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
 		}
-
+		//NICO: resultado no se ha modificado
 		return resultado;
 	}
 
@@ -351,6 +353,7 @@ public class FWQ_Visitor {
 					if (operacion == 3) {
 						// Se quiere entrar al parque
 						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
+						//NICO: por qué sale aquí?
 						salir = 1;
 					}
 					else if (operacion == 4) {
@@ -426,17 +429,18 @@ public class FWQ_Visitor {
 
 		//preparar(QueueHandlerHost, QueueHandlerPort);
 		// Kafka Producer
-		ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-		ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
-		ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        producer = new KafkaProducer<String, String>(ProducerProps);
+		Properties producerProps = new Properties();
+		FQW_Visitor.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
+		FQW_Visitor.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
+		FQW_Visitor.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        producer = new KafkaProducer<String, String>(FQW_Visitor.ProducerProps);
 
 		// Kafka Consumer
-		ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-        ConsumerProps.put("group.id", topicConsumer);
-        ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		consumer = new KafkaConsumer<String, String>(ConsumerProps);
+		FQW_Visitor.ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
+        FQW_Visitor.ConsumerProps.put("group.id", topicConsumer);
+        FQW_Visitor.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        FQW_Visitor.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		consumer = new KafkaConsumer<String, String>(FQW_Visitor.ConsumerProps);
 		// Suscribir el consumer a un topic
 		consumer.subscribe(Collections.singletonList(topicConsumer));
 
