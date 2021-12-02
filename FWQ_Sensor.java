@@ -15,6 +15,15 @@ public class FWQ_Sensor {
 	private KafkaProducer<String, Integer> producer;
 	private Integer personas;
 
+	private class ProducerCallback implements Callback { 1
+    @Override
+    public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+        if (e != null) {
+			System.out.println("Mensaje no recibido correctamente, puede que haya caído el broker o el WTS");
+        }
+    }
+}
+
 	public FWQ_Sensor(String ipBroker, String puertoBroker, String id){
 		this.ipBroker = ipBroker;
 		this.puertoBroker = puertoBroker;
@@ -28,7 +37,7 @@ public class FWQ_Sensor {
 			personas = rd.nextInt(50);
 			ProducerRecord<String, Integer> record = new ProducerRecord<>("Sensores", id, personas);
 			try {
-				producer.send(record);
+				producer.send(record, new ProducerCallback);
 				System.out.println("Atracción " + id + ": " + personas);
 			} 
 			catch (Exception e) {
