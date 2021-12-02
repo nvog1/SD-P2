@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		FWQ_Engine.java = FWQ_Engine.java
 		FWQ_HiloEngineKafka.java = FWQ_HiloEngineKafka.java
+		FWQ_HiloEngineSocket.java = FWQ_HiloEngineSocket.java
 		FWQ_HiloServidorRegistro.java = FWQ_HiloServidorRegistro.java
 		FWQ_Registry.java = FWQ_Registry.java
 		FWQ_Sensor.java = FWQ_Sensor.java
