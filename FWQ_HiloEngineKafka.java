@@ -297,7 +297,7 @@ public class FWQ_HiloEngineKafka extends Thread {
             // Se quiere entrar (value == "0") o salir (value == "1")
             if (entrarSalir(topic, value)) {
                 // El usuario esta registrado y cabe en el parque (no supera aforo)
-                ProducerRecord<String, String> record = new ProducerRecord<>(vectorResultados[2], key, "entrar");
+                ProducerRecord<String, String> record = new ProducerRecord<String, String>(vectorResultados[2], key, "entrar");
 
                 try {
                     // Aqui hay un warning que podemos obviar
