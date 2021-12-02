@@ -429,18 +429,18 @@ public class FWQ_Visitor {
 
 		//preparar(QueueHandlerHost, QueueHandlerPort);
 		// Kafka Producer
-		Properties producerProps = new Properties();
-		FQW_Visitor.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-		FQW_Visitor.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
-		FQW_Visitor.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        producer = new KafkaProducer<String, String>(FQW_Visitor.ProducerProps);
+		//NICO: he puesto FWQ_Visitor porque las props son estáticas( realmente no sé si hace falta)
+		FWQ_Visitor.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
+		FWQ_Visitor.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
+		FWQ_Visitor.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        producer = new KafkaProducer<String, String>(FWQ_Visitor.ProducerProps);
 
 		// Kafka Consumer
-		FQW_Visitor.ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-        FQW_Visitor.ConsumerProps.put("group.id", topicConsumer);
-        FQW_Visitor.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        FQW_Visitor.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		consumer = new KafkaConsumer<String, String>(FQW_Visitor.ConsumerProps);
+		FWQ_Visitor.ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
+        FWQ_Visitor.ConsumerProps.put("group.id", topicConsumer);
+        FWQ_Visitor.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        FWQ_Visitor.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		consumer = new KafkaConsumer<String, String>(FWQ_Visitor.ConsumerProps);
 		// Suscribir el consumer a un topic
 		consumer.subscribe(Collections.singletonList(topicConsumer));
 

@@ -107,6 +107,7 @@ public class FWQ_HiloEngineKafka extends Thread {
                 op1 = false;
             }
 
+			//NICO: si el usuario no está registrado, da igual si cabe o no. yo pondría este if else dentro del if está registrado
             if (consultarNumUsuSQL() > maxVisitantes) {
                 // Se ha alcanzado el numero maximo de visitantes
                 System.out.println("Se ha alcanzado el aforo maximo");
@@ -297,7 +298,8 @@ public class FWQ_HiloEngineKafka extends Thread {
             // Se quiere entrar (value == "0") o salir (value == "1")
             if (entrarSalir(topic, value)) {
                 // El usuario esta registrado y cabe en el parque (no supera aforo)
-                ProducerRecord<String, String> record = new ProducerRecord<>(vectorResultados[2], key, "entrar");
+				//NICO: faltaba <String, String> del new
+                ProducerRecord<String, String> record = new ProducerRecord<String, String>(vectorResultados[2], key, "entrar");
 
                 try {
                     // Aqui hay un warning que podemos obviar
