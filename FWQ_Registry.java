@@ -30,6 +30,9 @@ public class FWQ_Registry {
                 t.start();
             }
         }
+        catch (SocketException e) {
+            System.out.println("Error: El visitante se ha desconectado");
+        }
         catch (Exception e) {
             System.out.println("Error: " + e.toString());
         }

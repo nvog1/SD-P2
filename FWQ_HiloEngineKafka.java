@@ -21,7 +21,8 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 
     public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, int aforo) {
-        maxVisitantes = aforo;
+        System.out.println("Configurando propiedades locales");
+		maxVisitantes = aforo;
 
         this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
@@ -30,7 +31,7 @@ public class FWQ_HiloEngineKafka extends Thread {
         producer = new KafkaProducer<String, String>(ProducerProps);
 
         this.ConsumerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
-        this.ConsumerProps.put("group.id", "Visitors");
+        this.ConsumerProps.put("group.id", "Visitor");
         this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
@@ -317,10 +318,10 @@ public class FWQ_HiloEngineKafka extends Thread {
         try {
             // Bucle de escucha kafka
             while (continuar) {
-				System.out.println("Entro al bucle de Kafka");
                 ConsumerRecords<String, String> records = consumer.poll(timeout);
 
                 for (ConsumerRecord<String, String> record : records) {
+					System.out.println("Entro al bucle de records");
                     System.out.println("Se asignaran las variables recibidas por kafka");
                     // Asignamos las variables
                     topic = record.topic();
