@@ -41,7 +41,7 @@ public class WTSHiloKafka extends Thread {
 
 				for (ConsumerRecord<String, Integer> record : records) {
 
-
+					System.out.println("Atracción: " + record.key() + ". Personas: " + record.value().toString());
 					//lógica del hilokafka	
 					//actualizo el valor "personas" en la bbdd
 					try{

@@ -5,6 +5,7 @@ import java.lang.Exception;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.io.*;
+import java.util.*;
 
 public class WTSHiloSck extends Thread{
 	
@@ -58,6 +59,32 @@ public class WTSHiloSck extends Thread{
 				System.out.println("Sirviendo al motor...");
 
 				//lógica de servir al engine. (leer fichero con info, enviar datos)
+				try{
+					BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
+					List<String> atracciones = new ArrayList<String>();
+					String atraccion = bufrd.readLine();
+					while(atraccion != null){
+						String[] items = atraccion.split(";");
+						// tiempoEspera = (personas / personasCiclo) * tiempoCiclo
+						float tiempoEspera = (Integer.parseInt(items[1]) / Integer.parseInt(items[2]) ) * Integer.parseInt(items[3]);
+						atraccion = items[0] + ";" + tiempoEspera;
+
+						atracciones.add(atraccion);
+						atraccion = bufrd.readLine();
+					}
+
+					//envío la info
+					String mensaje = "";
+					for(String linea: atracciones){
+						mensaje += linea + "\n";
+					}
+
+					escribeSocket(cs, mensaje);
+					
+				}
+				catch(Exception e){
+					System.out.println("Error: " + e.toString());
+				}
 
 				cs.close();
 			}
