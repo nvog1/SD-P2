@@ -8,6 +8,8 @@ import java.util.concurrent.*;
 
 import org.apache.kafka.clients.producer.*;
 
+
+
 public class FWQ_Sensor {
 	private String id;
 	private String ipBroker;
@@ -15,14 +17,14 @@ public class FWQ_Sensor {
 	private KafkaProducer<String, Integer> producer;
 	private Integer personas;
 
-	private class ProducerCallback implements Callback { 1
-    @Override
-    public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-        if (e != null) {
-			System.out.println("Mensaje no recibido correctamente, puede que haya caído el broker o el WTS");
-        }
-    }
-}
+	private class ProducerCallback implements Callback {
+		@Override
+		public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+			if (e != null) {
+				System.out.println("Mensaje no recibido correctamente, puede que haya caído el broker o el WTS");
+			}
+		}
+	}
 
 	public FWQ_Sensor(String ipBroker, String puertoBroker, String id){
 		this.ipBroker = ipBroker;
@@ -37,7 +39,7 @@ public class FWQ_Sensor {
 			personas = rd.nextInt(50);
 			ProducerRecord<String, Integer> record = new ProducerRecord<>("Sensores", id, personas);
 			try {
-				producer.send(record, new ProducerCallback);
+				producer.send(record, new ProducerCallback());
 				System.out.println("Atracción " + id + ": " + personas);
 			} 
 			catch (Exception e) {
@@ -62,11 +64,12 @@ public class FWQ_Sensor {
 
 		Properties kafkaProps = new Properties();
 		kafkaProps.put("bootstrap.servers", sensor.ipBroker + ":" + sensor.puertoBroker);
-
-		kafkaProps.put("key.serializer",
-			"org.apache.kafka.common.serialization.StringSerializer");
-		kafkaProps.put("value.serializer",
-			"org.apache.kafka.common.serialization.IntegerSerializer");
+		kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.IntegerSerializer");
+		kafkaProps.put("max.block.ms", "1000");
+		kafkaProps.put("delivery.timeout.ms", "1900");
+		kafkaProps.put("linger.ms", "0");
+		kafkaProps.put("request.timeout.ms", "50");
 
 		sensor.producer = new KafkaProducer<String, Integer>(kafkaProps);
 
