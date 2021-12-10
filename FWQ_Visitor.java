@@ -168,6 +168,7 @@ public class FWQ_Visitor {
 	public String recibirKafka() {
 		String result = "", topic = "", key = "", value = "";
         Duration timeout = Duration.ofMillis(100);
+		boolean continuar = true;
 
 		try {
             // Bucle de escucha kafka
@@ -199,6 +200,7 @@ public class FWQ_Visitor {
 	public String entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
+		String entrarResult = "";
 		boolean visitorExists = false;
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
