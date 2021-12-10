@@ -166,7 +166,8 @@ public class FWQ_Visitor {
 	}
 
 	public String recibirKafka() {
-		String result = "";
+		String result = "", topic = "", key = "", value = "";
+        Duration timeout = Duration.ofMillis(100);
 
 		try {
             // Bucle de escucha kafka
