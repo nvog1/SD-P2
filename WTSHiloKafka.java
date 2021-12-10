@@ -45,8 +45,8 @@ public class WTSHiloKafka extends Thread {
 					//l�gica del hilokafka	
 					//actualizo el valor "personas" en la bbdd
 					try{
-						// TODO: BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
-						BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
+						BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
+						// TODO Jose:BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
 						List<String> atracciones = new ArrayList<String>();
 						String atraccion = bufrd.readLine();
 						while(atraccion != null){
@@ -61,8 +61,8 @@ public class WTSHiloKafka extends Thread {
 						}
 
 						//reescribo el fichero
-						// TODO: try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\SD-P2\\atracciones.txt"))) {
-						try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\atracciones.txt"))) {
+						try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\SD-P2\\atracciones.txt"))) {
+						// TODO Jose: try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\atracciones.txt"))) {
 							for(String linea: atracciones){
 								bufferedWriter.write(linea + "\n");
 							}
