@@ -16,23 +16,6 @@ public class FWQ_Visitor {
 	private static KafkaProducer producer;
 	private static KafkaConsumer consumer;
 
-	/*public void preparar(String QueueHandlerHost, String QueueHandlerPort) {
-		// Kafka Producer
-		this.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-		this.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
-		this.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        this.producer = new KafkaProducer<String, String>(ProducerProps);
-
-		// Kafka Consumer
-		this.ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-        this.ConsumerProps.put("group.id", topicConsumer);
-        this.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        this.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		this.consumer = new KafkaConsumer<String, String>(ConsumerProps);
-		// Suscribir el consumer a un topic
-		consumer.subscribe(Collections.singletonList(topicConsumer));
-	}*/
-
     public String leeSocket (Socket p_sk, String p_Datos)
 	{
 		try
@@ -182,62 +165,41 @@ public class FWQ_Visitor {
 		}
 	}
 
-	/*public void enviarKafka(KafkaProducer producer, String TopicProducer, String key, String value, String p_QueueHandlerHost, String p_QueueHandlerPort) {
-		// Preguntar construccion del mensage con el topic (topic, key, value)
-		ProducerRecord<String, String> record = new ProducerRecord<>(TopicProducer, key, value);
-		Boolean entrar = false;
-
-		System.out.println("Se va a enviar el mensaje de Kafka");
-		try {
-			// Aqui hay un warning que podemos obviar
-			producer.send(record);
-			System.out.println("Mensaje enviado");
-		}
-		catch(Exception e) {
-			System.out.println("Error: " + e.toString());
-		}
-
-		System.out.println("Paso el envio");
-		// Visitor recibe la respuesta como consumer
-		try {
-			Duration timeout = Duration.ofMillis(100);
-			boolean continuar = true;
-
-			while (continuar) {
-				ConsumerRecords<String, String> records = consumer.poll(timeout);
-
-				for (ConsumerRecord<String, String> consumerRecord : records) {
-					if (consumerRecord.value().equals("entrar")) {
-						System.out.println("El usuario puede entrar");
-						entrar = true;
-						continuar = false;
-					}
-				}
-			}
-
-			if (entrar) {
-				dentroParque();
-			}
-		}
-		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
-		}
-	}*/
-
 	public String recibirKafka() {
-		String result = "";
+		String result = "", topic = "", key = "", value = "";
+        Duration timeout = Duration.ofMillis(100);
 
+		try {
+            // Bucle de escucha kafka
+            while (continuar) {
+                ConsumerRecords<String, String> records = consumer.poll(timeout);
+
+				// Topic: topic de vuelta (TopicConsumer)
+				// Key: Accion a realizar
+				// Value: resultado de la accion
+                for (ConsumerRecord<String, String> record : records) {
+                    // Asignamos las variables
+                    topic = record.topic();
+                    key = record.key();
+                    value = record.value();
+                    System.out.println("Mensaje recibido por Kafka -> " + 
+						"Topic: " + topic + "; Key: " + key + "; Value: " + value);
+					
+					result = value;
+                }
+            }
+        }
+        catch (Exception e) {
+            System.out.println("Error al leer mensajes de Kafka");
+        }
 
 		return result;
 	}
 
-	public String entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
+	public Void entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
 		boolean visitorExists = false;
-		//NICO: no puedes saber que topicConsumer no sea null(si no se ha registrado, por ejemplo)
-		//NICO: aliasVisitor contendrá ""
-		String topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer;
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
 
@@ -248,7 +210,7 @@ public class FWQ_Visitor {
 			PWVisitor = br.readLine();
 
 			// Consulta si el usuario esta registrado
-			// topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer
+			String topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer;
 			//enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor + ";" + topicConsumer, p_QueueHandlerHost, p_QueueHandlerPort);
 			ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
 			System.out.println("Se va a enviar el mensaje de Kafka");
@@ -256,18 +218,18 @@ public class FWQ_Visitor {
 				// Aqui hay un warning que podemos obviar
 				producer.send(record);
 				System.out.println("Mensaje enviado");
+				entrarResult = recibirKafka();
+				if (entrarResult.equals("entrar")) {
+					dentroParque();
+				}
 			}
 			catch(Exception e) {
 				System.out.println("Error: " + e.toString());
 			}
-
-			System.out.println("Se ha pasado el envio");
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
 		}
-		//NICO: resultado no se ha modificado
-		return resultado;
 	}
 
 	public String salirParque() {
@@ -353,7 +315,6 @@ public class FWQ_Visitor {
 					if (operacion == 3) {
 						// Se quiere entrar al parque
 						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
-						//NICO: por qué sale aquí?
 						salir = 1;
 					}
 					else if (operacion == 4) {
@@ -429,11 +390,10 @@ public class FWQ_Visitor {
 
 		//preparar(QueueHandlerHost, QueueHandlerPort);
 		// Kafka Producer
-		//NICO: he puesto FWQ_Visitor porque las props son estáticas( realmente no sé si hace falta)
 		FWQ_Visitor.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
 		FWQ_Visitor.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
 		FWQ_Visitor.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        producer = new KafkaProducer<String, String>(FWQ_Visitor.ProducerProps);
+        FWQ_Visitor.producer = new KafkaProducer<String, String>(FWQ_Visitor.ProducerProps);
 
 		// Kafka Consumer
 		FWQ_Visitor.ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);

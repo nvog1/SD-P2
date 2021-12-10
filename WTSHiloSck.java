@@ -1,5 +1,5 @@
 //hilo que espera las peticiones del engine, para que WTS no se quede bloqueado esperando.
-//cuando recibe petición, lee la bbdd y pasa la información a engine
+//cuando recibe peticiï¿½n, lee la bbdd y pasa la informaciï¿½n a engine
 import java.net.*;
 import java.lang.Exception;
 import java.lang.reflect.Array;
@@ -58,9 +58,10 @@ public class WTSHiloSck extends Thread{
 				Socket cs = ss.accept();
 				System.out.println("Sirviendo al motor...");
 
-				//lógica de servir al engine. (leer fichero con info, enviar datos)
+				//lï¿½gica de servir al engine. (leer fichero con info, enviar datos)
 				try{
 					BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
+					//TODO Jose: BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
 					List<String> atracciones = new ArrayList<String>();
 					String atraccion = bufrd.readLine();
 					while(atraccion != null){
@@ -73,7 +74,7 @@ public class WTSHiloSck extends Thread{
 						atraccion = bufrd.readLine();
 					}
 
-					//envío la info
+					//envï¿½o la info
 					String mensaje = "";
 					for(String linea: atracciones){
 						mensaje += linea + "\n";

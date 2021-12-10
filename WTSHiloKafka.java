@@ -41,11 +41,12 @@ public class WTSHiloKafka extends Thread {
 
 				for (ConsumerRecord<String, Integer> record : records) {
 
-					System.out.println("Atracción: " + record.key() + ". Personas: " + record.value().toString());
-					//lógica del hilokafka	
+					System.out.println("Atracciï¿½n: " + record.key() + ". Personas: " + record.value().toString());
+					//lï¿½gica del hilokafka	
 					//actualizo el valor "personas" en la bbdd
 					try{
 						BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
+						// TODO Jose:BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
 						List<String> atracciones = new ArrayList<String>();
 						String atraccion = bufrd.readLine();
 						while(atraccion != null){
@@ -61,6 +62,7 @@ public class WTSHiloKafka extends Thread {
 
 						//reescribo el fichero
 						try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\SD-P2\\atracciones.txt"))) {
+						// TODO Jose: try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\atracciones.txt"))) {
 							for(String linea: atracciones){
 								bufferedWriter.write(linea + "\n");
 							}
