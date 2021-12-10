@@ -426,17 +426,17 @@ public class FWQ_Visitor {
 
 		//preparar(QueueHandlerHost, QueueHandlerPort);
 		// Kafka Producer
-		ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-		ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
-		ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        producer = new KafkaProducer<String, String>(ProducerProps);
+		FWQ_Visitor.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
+		FWQ_Visitor.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
+		FWQ_Visitor.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        producer = new KafkaProducer<String, String>(FWQ_Visitor.ProducerProps);
 
 		// Kafka Consumer
-		ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
-        ConsumerProps.put("group.id", topicConsumer);
-        ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		consumer = new KafkaConsumer<String, String>(ConsumerProps);
+		FWQ_Visitor.ConsumerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
+        FWQ_Visitor.ConsumerProps.put("group.id", topicConsumer);
+        FWQ_Visitor.ConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        FWQ_Visitor.ConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		consumer = new KafkaConsumer<String, String>(FWQ_Visitor.ConsumerProps);
 		// Suscribir el consumer a un topic
 		consumer.subscribe(Collections.singletonList(topicConsumer));
 

@@ -336,14 +336,4 @@ public class FWQ_HiloEngineKafka extends Thread {
             System.out.println("Error: " + e.toString());
         }
     }
-
-    
-	/*private static class DemoProducerCallback implements Callback {
-		@Override
-		public void onCompletion(RecordMetadata recordMetadata, Exception e){
-			if (e != null) {
-				e.printStackTrace();
-			}
-		}
-	}*/
 }
