@@ -51,12 +51,10 @@ public class FWQ_HiloEngineKafka extends Thread {
             ResultSet result = statement.executeQuery(sentence);
             if (result.next()) {
                 // Algun usuario concuerda con los datos
-                System.out.println("El usuario esta registrado.");
                 resultado = true;
             }
             else {
                 // Result esta vacio,no hay ningun usuario que concuerde
-                System.out.println("El usuario no esta registrado.");
                 resultado = false;
             }
             statement.close();
@@ -93,7 +91,7 @@ public class FWQ_HiloEngineKafka extends Thread {
         Boolean result = false;
         String[] vectorResultados = value.split(";");
 
-        if (vectorResultados[0] == "entrar") {
+        if (vectorResultados[0].equals("entrar")) {
             // El usuario quiere entrar al parque
             System.out.println("El usuario " + vectorResultados[1] + " quiere entrar al parque");
 
@@ -293,15 +291,15 @@ public class FWQ_HiloEngineKafka extends Thread {
         String[] vectorResultados = value.split(";");
 
         System.out.println("Topic: " + topic + "; Key: " + key + "; Value: " + vectorResultados[0]);
-        if (key == "entrarSalir") {
+        if (key.equals("entrarSalir")) {
             // Se quiere entrar (value == "0") o salir (value == "1")
-            if (entrarSalir(topic, value)) {
-                // El usuario esta registrado y cabe en el parque (no supera aforo)
+			Boolean boolResult = entrarSalir(topic, value);
+            if (boolResult) {
+                // El usuario esta registrado y cabe en el parque (no supera aforo), puede entrar
                 ProducerRecord<String, String> record = new ProducerRecord<String, String>(vectorResultados[2], key, "entrar");
 
                 try {
-                    // Aqui hay un warning que podemos obviar
-                    producer.send(record/*, new DemoProducerCallback()*/);
+                    producer.send(record);
                 }
                 catch(Exception e) {
                     System.out.println("Error: " + e.toString());
@@ -321,7 +319,6 @@ public class FWQ_HiloEngineKafka extends Thread {
                 ConsumerRecords<String, String> records = consumer.poll(timeout);
 
                 for (ConsumerRecord<String, String> record : records) {
-					System.out.println("Entro al bucle de records");
                     System.out.println("Se asignaran las variables recibidas por kafka");
                     // Asignamos las variables
                     topic = record.topic();
