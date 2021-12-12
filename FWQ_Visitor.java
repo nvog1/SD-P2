@@ -146,7 +146,7 @@ public class FWQ_Visitor {
 		String mov = "";
 		Random rd = new Random();
 
-		// El visitor ya ha entrado al parque, se aplicará la lógica
+		// El visitor acaba de entrar al parque (no tiene posicion), se aplicara la logica
 		if (posicionActual.equals("")) {
 			// Se elige una posicion aleatoria
 			int posX = rd.nextInt(20);
@@ -157,11 +157,29 @@ public class FWQ_Visitor {
 			// Ya tiene una posicion asignada
 			// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
 			while (resp != 's') {
-				mov = proximoMov();
-				//------AQUI------//
-				//enviarKafka(producer, TopicConsumer, key, value, p_QueueHandlerHost, p_QueueHandlerPort);
+				String entrarResult = "";
 
+				mov = proximoMov();
+				String topic = "Visitor", key = "Mov", value = posicionActual + ";" + mov + ";" + topicConsumer;
+				enviarKafka(topic, key, value);
+				entrarResult = recibirKafka();
+				if (!entrarResult.equals("entrar")) {
+					// Devuelve el mapa del parque con los otros visitantes y las atracciones
+					
+				}
 			}
+		}
+	}
+
+	public void enviarKafka(String topic, String key, String value) {
+		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+		System.out.println("Se va a enviar el mensaje de Kafka");
+		try {
+			producer.send(record);
+			System.out.println("Mensaje enviado");
+		}
+		catch(Exception e) {
+			System.out.println("Error al enviar el mensaje por Kafkas");
 		}
 	}
 
@@ -183,7 +201,7 @@ public class FWQ_Visitor {
                     topic = record.topic();
                     key = record.key();
                     value = record.value();
-                    System.out.println("Mensaje recibido por Kafka -> " + 
+                    System.out.println("Mensaje recibido por Kafka desde el motor -> " + 
 						"Topic: " + topic + "; Key: " + key + "; Value: " + value);
 					
 					result = value;
@@ -213,24 +231,14 @@ public class FWQ_Visitor {
 
 			// Consulta si el usuario esta registrado
 			String topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer;
-			//enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor + ";" + topicConsumer, p_QueueHandlerHost, p_QueueHandlerPort);
-			ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
-			System.out.println("Se va a enviar el mensaje de Kafka");
-			try {
-				// Aqui hay un warning que podemos obviar
-				producer.send(record);
-				System.out.println("Mensaje enviado");
-				entrarResult = recibirKafka();
-				if (entrarResult.equals("entrar")) {
-					dentroParque();
-				}
-			}
-			catch(Exception e) {
-				System.out.println("Error: " + e.toString());
+			enviarKafka(topic, key, value);
+			entrarResult = recibirKafka();
+			if (entrarResult.equals("entrar")) {
+				dentroParque();
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir datos por consola");
 		}
 
 		return resultado;

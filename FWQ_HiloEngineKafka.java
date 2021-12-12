@@ -296,17 +296,26 @@ public class FWQ_HiloEngineKafka extends Thread {
 			Boolean boolResult = entrarSalir(topic, value);
             if (boolResult) {
                 // El usuario esta registrado y cabe en el parque (no supera aforo), puede entrar
-                ProducerRecord<String, String> record = new ProducerRecord<String, String>(vectorResultados[2], key, "entrar");
-
-                try {
-                    producer.send(record);
-                }
-                catch(Exception e) {
-                    System.out.println("Error: " + e.toString());
-                }
+                enviarKafka(vectorResultados[2], key, "entrar");
             }
         }
+		else if (key.equals("Mov")) {
+			// Se procesa el movimiento del visitor
+			
+		}
     }
+
+	public void enviarKafka(String topic, String key, String value) {
+		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+		System.out.println("Se va a enviar el mensaje de Kafka");
+		try {
+			producer.send(record);
+			System.out.println("Mensaje enviado");
+		}
+		catch(Exception e) {
+			System.out.println("Error al enviar el mensaje por Kafkas");
+		}
+	}
 
     public void run() {
         boolean continuar = true;
