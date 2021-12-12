@@ -141,7 +141,7 @@ public class FWQ_Visitor {
 		return result;
 	}
 
-	public void dentroParque() {
+	public void dentroParque(String AliasVisitor) {
 		char resp = '0';
 		String mov = "";
 		Random rd = new Random();
@@ -157,15 +157,15 @@ public class FWQ_Visitor {
 			// Ya tiene una posicion asignada
 			// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
 			while (resp != 's') {
-				String entrarResult = "";
+				String kafkaResult = "";
 
 				mov = proximoMov();
-				String topic = "Visitor", key = "Mov", value = posicionActual + ";" + mov + ";" + topicConsumer;
+				String topic = "Visitor", key = "Mov", value = AliasVisitor + ";" + posicionActual + ";" + mov + ";" + topicConsumer;
 				enviarKafka(topic, key, value);
-				entrarResult = recibirKafka();
-				if (!entrarResult.equals("entrar")) {
+				kafkaResult = recibirKafka();
+				if (!kafkaResult.equals("entrar")) {
 					// Devuelve el mapa del parque con los otros visitantes y las atracciones
-					
+					System.out.println(kafkaResult);
 				}
 			}
 		}
@@ -218,7 +218,7 @@ public class FWQ_Visitor {
 	public String entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
-		String entrarResult = "";
+		String kafkaResult = "";
 		boolean visitorExists = false;
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
@@ -232,9 +232,9 @@ public class FWQ_Visitor {
 			// Consulta si el usuario esta registrado
 			String topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer;
 			enviarKafka(topic, key, value);
-			entrarResult = recibirKafka();
-			if (entrarResult.equals("entrar")) {
-				dentroParque();
+			kafkaResult = recibirKafka();
+			if (kafkaResult.equals("entrar")) {
+				dentroParque(AliasVisitor);
 			}
 		}
 		catch (Exception e) {

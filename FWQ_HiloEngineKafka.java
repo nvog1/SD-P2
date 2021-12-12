@@ -301,7 +301,11 @@ public class FWQ_HiloEngineKafka extends Thread {
         }
 		else if (key.equals("Mov")) {
 			// Se procesa el movimiento del visitor
-			
+			// Topic: Visitor; Key: "Mov"; Value: AliasVisitor;posX;posY;proxMov(numero);TopicConsumer
+			String resultado = "";
+			resultado = CadenaMapa(actualizarMapa(vectorResultados[0], vectorResultados[3]));
+			// Se devuelve el mapa al visitor
+			enviarKafka(vectorResultados[4], key, resultado);
 		}
     }
 
