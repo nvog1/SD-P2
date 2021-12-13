@@ -152,21 +152,34 @@ public class FWQ_Visitor {
 			int posX = rd.nextInt(20);
 			int posY = rd.nextInt(20);
 			posicionActual = posX + ";" + posY;
+			System.out.println("Posicion del cliente: " + posicionActual);
 		}
-		else {
-			// Ya tiene una posicion asignada
-			// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
-			while (resp != 's') {
-				String kafkaResult = "";
+		// Ya tiene una posicion asignada
+		// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
+		while (resp != 's') {
+			String kafkaResult = "";
 
-				mov = proximoMov();
-				String topic = "Visitor", key = "Mov", value = AliasVisitor + ";" + posicionActual + ";" + mov + ";" + topicConsumer;
-				enviarKafka(topic, key, value);
-				kafkaResult = recibirKafka();
-				if (!kafkaResult.equals("entrar")) {
-					// Devuelve el mapa del parque con los otros visitantes y las atracciones
-					System.out.println(kafkaResult);
-				}
+			mov = proximoMov();
+			String topic = "Visitor", key = "Mov", value = AliasVisitor + ";" + posicionActual + ";" + mov + ";" + topicConsumer;
+			enviarKafka(topic, key, value);
+			kafkaResult = recibirKafka();
+			if (!kafkaResult.equals("entrar")) {
+				// Devuelve el mapa del parque con los otros visitantes y las atracciones
+				System.out.println(kafkaResult);
+			}
+
+			// Se para la ejecucion los segundos especificados
+			topic = "Visitor";
+			key = "Seg";
+			value = AliasVisitor + ";" + topicConsumer;
+			enviarKafka(topic, key, value);
+			kafkaResult = recibirKafka();
+			long tiempoEspera = Integer.parseInt(kafkaResult) * 1000;
+			try {
+				Thread.sleep(tiempoEspera);
+			}
+			catch(Exception e) {
+				System.out.println("Error durante el tiempo de espera");
 			}
 		}
 	}
@@ -204,7 +217,7 @@ public class FWQ_Visitor {
                     System.out.println("Mensaje recibido por Kafka desde el motor -> " + 
 						"Topic: " + topic + "; Key: " + key + "; Value: " + value);
 					
-					result = value;
+					return value;
                 }
             }
         }

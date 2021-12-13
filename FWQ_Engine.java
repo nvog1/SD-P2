@@ -274,7 +274,7 @@ public class FWQ_Engine {
 			
 
 			// Hilo de kafka
-			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
+			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes, segundos);
 			tKafka.start();
 
 			//conexion a wts

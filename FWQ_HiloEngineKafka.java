@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.sql.*;
 
 public class FWQ_HiloEngineKafka extends Thread {
-    private int maxVisitantes;
+    private Integer maxVisitantes, tiempoSeg;
 
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
@@ -20,9 +20,10 @@ public class FWQ_HiloEngineKafka extends Thread {
     private KafkaConsumer<String, String> consumer;
 
 
-    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, int aforo) {
+    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, Integer aforo, Integer segundos) {
         System.out.println("Configurando propiedades locales");
 		maxVisitantes = aforo;
+		tiempoSeg = segundos;
 
         this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
@@ -232,11 +233,12 @@ public class FWQ_HiloEngineKafka extends Thread {
 			caracter++;
 		}
 
+		cadena = cadena + "MAPA DEL PARQUE";
 		// Creacion del mapa
 		for(int i = 0; i < 20; i++) {
 			for (int j = 0; j < 20; j++){
 				if (matriz[i][j] == null) {
-					cadena = cadena + "·";
+					cadena = cadena + " . ";
 				}
 				else {
 					// Implementado para los visitantes
@@ -306,6 +308,11 @@ public class FWQ_HiloEngineKafka extends Thread {
 			resultado = CadenaMapa(actualizarMapa(vectorResultados[0], vectorResultados[3]));
 			// Se devuelve el mapa al visitor
 			enviarKafka(vectorResultados[4], key, resultado);
+		}
+		else if (key.equals("Seg")) {
+			// Se le envia al visitor el tiempo especificado
+			// Topic: Visitor; Key: "Seg"; Value: AliasVisitor;TopicConsumer
+			enviarKafka(vectorResultados[1], key, tiempoSeg.toString());
 		}
     }
 
