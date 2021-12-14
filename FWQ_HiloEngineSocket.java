@@ -1,5 +1,5 @@
 import java.lang.Exception;
-import java.net.Socket;
+import java.net.*;
 import java.io.*;
 import java.time.Duration;
 
@@ -17,6 +17,9 @@ public class FWQ_HiloEngineSocket extends Thread {
             p_Datos = new String();
             p_Datos = flujo.readUTF();
         }
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
         catch (Exception e) {
             System.out.println("Error: " + e.toString());
         }

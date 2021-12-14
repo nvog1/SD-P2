@@ -32,6 +32,9 @@ public class FWQ_Engine {
 			DataInputStream flujo = new DataInputStream( aux );
 			p_Datos = flujo.readUTF();
 		}
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
 		catch (Exception e)
 		{
 			System.out.println("Error: " + e.toString());
@@ -269,7 +272,7 @@ public class FWQ_Engine {
 				segundos = Integer.parseInt(args[5]);
 			}
 			catch(Exception e){
-				System.out.println("error al convertir par�metros");
+				System.out.println("Error al convertir par�metros");
 			}
 			
 

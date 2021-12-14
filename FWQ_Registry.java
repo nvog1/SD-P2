@@ -1,4 +1,5 @@
 import java.net.*;
+import java.io.*;
 
 /*
 * Argumentos de llamada: 
@@ -33,8 +34,8 @@ public class FWQ_Registry {
         catch (SocketException e) {
             System.out.println("Error: El visitante se ha desconectado");
         }
-        catch (Exception e) {
-            System.out.println("Error: " + e.toString());
+        catch (IOException e) {
+            System.out.println("Error al manipular los sockets");
         }
     }
 }

@@ -9,6 +9,7 @@ import java.sql.*;
 
 public class FWQ_HiloEngineKafka extends Thread {
     private Integer maxVisitantes, tiempoSeg;
+	private String mapaParque = "";
 
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
@@ -233,7 +234,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			caracter++;
 		}
 
-		cadena = cadena + "MAPA DEL PARQUE";
+		cadena = cadena + "MAPA DEL PARQUE\n";
 		// Creacion del mapa
 		for(int i = 0; i < 20; i++) {
 			for (int j = 0; j < 20; j++){
@@ -243,7 +244,8 @@ public class FWQ_HiloEngineKafka extends Thread {
 				else {
 					// Implementado para los visitantes
 					Character aux = matriz[i][j].charAt(0);
-					if (aux.isLetter(matriz[i][j].charAt(0))) {
+					//if (aux.isLetter(matriz[i][j].charAt(0))) {
+					if (aux >= 97 && aux <= 122) {
 						// En la matriz hay un caracter (un visitante)
 						cadena = cadena + matriz[i][j];
 					}
@@ -285,6 +287,26 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		return resultado;
 	}
+
+	public void comprobarMapa(String AliasVisitor, String posX, String posY) {
+		try {
+			// Se comprueba si el usuario esta dentro del parque, si no lo esta se inserta a fwq_bbdd
+			Connection connection =  DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT * from FWQ_BBDD.Mapa WHERE Alias='" + AliasVisitor + "'");
+			if (result.next()) {
+				// Existe el usuario en la tabla mapa, no se hace nada
+			}
+			else {
+				// No existe el usuario, se inserta
+				String sentence = "INSERT INTO mapa VALUES ('" + AliasVisitor 
+					+ "', '" + posX + "', '" + posY + "')";
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("Error al manipular la tabla mapa SQL");
+		}
+	}
     
     public void procesarKafka(String topic, String key, String value) {
         // Topic muestra el ALias/ID del Visitor
@@ -305,9 +327,10 @@ public class FWQ_HiloEngineKafka extends Thread {
 			// Se procesa el movimiento del visitor
 			// Topic: Visitor; Key: "Mov"; Value: AliasVisitor;posX;posY;proxMov(numero);TopicConsumer
 			String resultado = "";
-			resultado = CadenaMapa(actualizarMapa(vectorResultados[0], vectorResultados[3]));
+			comprobarMapa(vectorResultados[0], vectorResultados[1], vectorResultados[2]);
+			mapaParque = CadenaMapa(actualizarMapa(vectorResultados[0], vectorResultados[3]));
 			// Se devuelve el mapa al visitor
-			enviarKafka(vectorResultados[4], key, resultado);
+			enviarKafka(vectorResultados[4], key, mapaParque);
 		}
 		else if (key.equals("Seg")) {
 			// Se le envia al visitor el tiempo especificado
@@ -333,24 +356,17 @@ public class FWQ_HiloEngineKafka extends Thread {
         Duration timeout = Duration.ofMillis(100);
         String topic = "", key = "", value = "";
 
-        try {
-            // Bucle de escucha kafka
-            while (continuar) {
-                ConsumerRecords<String, String> records = consumer.poll(timeout);
-
-                for (ConsumerRecord<String, String> record : records) {
-                    System.out.println("Se asignaran las variables recibidas por kafka");
-                    // Asignamos las variables
-                    topic = record.topic();
-                    key = record.key();
-                    value = record.value();
-
-                    procesarKafka(topic, key, value);
-                }
+        // Bucle de escucha kafka
+       while (continuar) {
+            ConsumerRecords<String, String> records = consumer.poll(timeout);
+            for (ConsumerRecord<String, String> record : records) {
+                System.out.println("Se asignaran las variables recibidas por kafka");
+                // Asignamos las variables
+                topic = record.topic();
+                key = record.key();
+                value = record.value();
+                procesarKafka(topic, key, value);
             }
-        }
-        catch (Exception e) {
-            System.out.println("Error: " + e.toString());
         }
     }
 }

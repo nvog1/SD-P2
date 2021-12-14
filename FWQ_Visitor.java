@@ -11,6 +11,7 @@ public class FWQ_Visitor {
 	private static String topicConsumer;
 	private String posicionActual = "";
 	private String atraccionObjetivo;
+	long tiempoEspera = 0;
 	private static Properties ProducerProps = new Properties();
 	private static Properties ConsumerProps = new Properties();
 	private static KafkaProducer producer;
@@ -24,9 +25,12 @@ public class FWQ_Visitor {
 			DataInputStream flujo = new DataInputStream( aux );
 			p_Datos = flujo.readUTF();
 		}
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al leer el socket");
 		}
       return p_Datos;
 	}
@@ -43,9 +47,12 @@ public class FWQ_Visitor {
 			DataOutputStream flujo= new DataOutputStream( aux );
 			flujo.writeUTF(p_Datos);      
 		}
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al escribir en el socket");
 		}
 		return;
 	}
@@ -68,7 +75,7 @@ public class FWQ_Visitor {
 
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir los datos por consola");
 		}
 
 		p_Cadena = p_operacion + ";" + Alias + 
@@ -123,7 +130,7 @@ public class FWQ_Visitor {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introucir los datos por consola");
 		}
 
 		return p_resultado;
@@ -156,7 +163,7 @@ public class FWQ_Visitor {
 		}
 		// Ya tiene una posicion asignada
 		// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
-		while (resp != 's') {
+		while (/*resp != 's'*/true) {
 			String kafkaResult = "";
 
 			mov = proximoMov();
@@ -169,12 +176,6 @@ public class FWQ_Visitor {
 			}
 
 			// Se para la ejecucion los segundos especificados
-			topic = "Visitor";
-			key = "Seg";
-			value = AliasVisitor + ";" + topicConsumer;
-			enviarKafka(topic, key, value);
-			kafkaResult = recibirKafka();
-			long tiempoEspera = Integer.parseInt(kafkaResult) * 1000;
 			try {
 				Thread.sleep(tiempoEspera);
 			}
@@ -192,7 +193,7 @@ public class FWQ_Visitor {
 			System.out.println("Mensaje enviado");
 		}
 		catch(Exception e) {
-			System.out.println("Error al enviar el mensaje por Kafkas");
+			System.out.println("Error al enviar el mensaje por Kafka");
 		}
 	}
 
@@ -232,6 +233,7 @@ public class FWQ_Visitor {
 		String AliasVisitor = "";
 		String PWVisitor = "";
 		String kafkaResult = "";
+		String topic = "", key = "", value = "";
 		boolean visitorExists = false;
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
@@ -241,11 +243,23 @@ public class FWQ_Visitor {
 			AliasVisitor = br.readLine();
 			System.out.println("Introduzca su contrasenya: ");
 			PWVisitor = br.readLine();
-
-			// Consulta si el usuario esta registrado
-			String topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer;
+			
+			// Segundos especificados en argumentos a lejecutar
+			topic = "Visitor";
+			key = "Seg";
+			value = AliasVisitor + ";" + topicConsumer;
 			enviarKafka(topic, key, value);
 			kafkaResult = recibirKafka();
+			tiempoEspera = Integer.parseInt(kafkaResult) * 1000;
+			System.out.println("Tiempo asignado");
+
+			// Consulta si el usuario esta registrado
+			topic = "Visitor";
+			key = "entrarSalir";
+			value = "entrar;" + AliasVisitor + ";" + topicConsumer;
+			enviarKafka(topic, key, value);
+			kafkaResult = recibirKafka();
+			System.out.println("Proceso de entrada hecho");
 			if (kafkaResult.equals("entrar")) {
 				dentroParque(AliasVisitor);
 			}
@@ -320,7 +334,7 @@ public class FWQ_Visitor {
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
 					while (resp != 's' && resp != 'n') {
-						System.out.println("¿Desea realizar alguna operacion mas? (s, n)");
+						System.out.println("Desea realizar alguna operacion mas? (s, n)");
 						resp = br.readLine().charAt(0);
 					}
 					if (resp != 's') {
@@ -361,7 +375,7 @@ public class FWQ_Visitor {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir los datos por consola");
 		}
 	}
 
@@ -387,7 +401,7 @@ public class FWQ_Visitor {
 			}
 		}
 		catch(Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir los datos por consola");
 		}
 	}
 

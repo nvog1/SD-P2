@@ -23,8 +23,11 @@ public class FWQ_HiloServidorRegistro extends Thread {
             p_Datos = new String();
             p_Datos = flujo.readUTF();
         }
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
         catch (Exception e) {
-            System.out.println("Error: " + e.toString());
+            System.out.println("Error al leer el socket");
         }
 
         return p_Datos;
@@ -40,7 +43,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al escribir en el socket");
 		}
 		return;
 	}
@@ -63,7 +66,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
             statement.close();
         }
         catch (SQLException e) {
-            System.out.println("Error SQL: " + e.getMessage());
+            System.out.println("Error al insertart un usuario en SQL");
         }
     }
    public void UpdateUsuarioSQL(String Alias, String nombre, String password) {
@@ -81,7 +84,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
             statement.close();
         }
         catch (SQLException e) {
-            System.out.println("Error SQL: " + e.getMessage());
+            System.out.println("Error al actualizar el usuario en SQL");
         }
     }
 
@@ -107,7 +110,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
             statement.close();
         }
         catch (SQLException e) {
-            System.out.println("Error SQL: " + e.getMessage());
+            System.out.println("Error al consultar usuarios en SQL");
         }
 
         return resultado;
@@ -173,8 +176,8 @@ public class FWQ_HiloServidorRegistro extends Thread {
         catch (SocketException e) {
             System.out.println("Error: El visitante se ha desconectado");
         }
-        catch (Exception e) {
-            System.out.println("Error: " + e.toString());
+        catch (IOException e) {
+            System.out.println("Error al manipular los sockets");
         }
     }
 }
