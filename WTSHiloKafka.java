@@ -41,18 +41,19 @@ public class WTSHiloKafka extends Thread {
 
 				for (ConsumerRecord<String, Integer> record : records) {
 
-					System.out.println("Atracci�n: " + record.key() + ". Personas: " + record.value().toString());
+					System.out.println("Atraccion: " + record.key() + ". Personas: " + record.value().toString());
 					//l�gica del hilokafka	
 					//actualizo el valor "personas" en la bbdd
 					try{
-						//BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
-						BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
+						BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
+						//BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
 						List<String> atracciones = new ArrayList<String>();
 						String atraccion = bufrd.readLine();
 						while(atraccion != null){
 							String[] items = atraccion.split(";");
 							if(Integer.parseInt(items[0]) == Integer.parseInt(record.key())){//si es la que nos ha llegado, actualizamos las personas
 								items[1] = record.value().toString();
+								//atraccion = id;personas;personasCiclo;tiempoCiclo;posX;posY;nombre
 								atraccion = items[0] + ";" + items[1] + ";" + items[2] + ";" + items[3] + ";" + items[4] + ";" + items[5] + ";" + items[6];
 							}
 
@@ -61,8 +62,8 @@ public class WTSHiloKafka extends Thread {
 						}
 
 						//reescribo el fichero
-						//try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\SD-P2\\atracciones.txt"))) {
-						try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\atracciones.txt"))) {
+						try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\SD-P2\\atracciones.txt"))) {
+						//try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\kafka\\atracciones.txt"))) {
 							for(String linea: atracciones){
 								bufferedWriter.write(linea + "\n");
 							}

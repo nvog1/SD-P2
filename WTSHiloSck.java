@@ -60,15 +60,16 @@ public class WTSHiloSck extends Thread{
 
 				//l�gica de servir al engine. (leer fichero con info, enviar datos)
 				try{
-					//BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
-					BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
+					BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
+					//BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\atracciones.txt"));
 					List<String> atracciones = new ArrayList<String>();
 					String atraccion = bufrd.readLine();
 					while(atraccion != null){
 						String[] items = atraccion.split(";");
 						// tiempoEspera = (personas / personasCiclo) * tiempoCiclo
 						float tiempoEspera = (Integer.parseInt(items[1]) / Integer.parseInt(items[2]) ) * Integer.parseInt(items[3]);
-						atraccion = items[0] + ";" + items[4] + ";" + items[5] + ";" + tiempoEspera;
+						//cada atraccion: id;x;y;tiempoEspera;tiempoCiclo
+						atraccion = items[0] + ";" + items[4] + ";" + items[5] + ";" + tiempoEspera + ";" + items[3];
 
 						atracciones.add(atraccion);
 						atraccion = bufrd.readLine();

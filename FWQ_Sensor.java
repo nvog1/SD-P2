@@ -21,7 +21,7 @@ public class FWQ_Sensor {
 		@Override
 		public void onCompletion(RecordMetadata recordMetadata, Exception e) {
 			if (e != null) {
-				System.out.println("Mensaje no recibido correctamente, puede que haya caído el broker o el WTS");
+				System.out.println("Mensaje no enviado correctamente, ha caído kafka");
 			}
 		}
 	}
