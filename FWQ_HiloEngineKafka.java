@@ -8,7 +8,8 @@ import java.time.Duration;
 import java.sql.*;
 
 public class FWQ_HiloEngineKafka extends Thread {
-    private int maxVisitantes;
+    private Integer maxVisitantes, tiempoSeg;
+	private String mapaParque = "";
 
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
@@ -20,13 +21,18 @@ public class FWQ_HiloEngineKafka extends Thread {
     private KafkaConsumer<String, String> consumer;
 
 
-    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, int aforo) {
+    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, Integer aforo, Integer segundos) {
         System.out.println("Configurando propiedades locales");
 		maxVisitantes = aforo;
+		tiempoSeg = segundos;
 
         this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
         this.ProducerProps.put("value.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
+		this.ProducerProps.put("max.block.ms", "1000");
+		this.ProducerProps.put("delivery.timeout.ms", "1900");
+		this.ProducerProps.put("linger.ms", "0");
+		this.ProducerProps.put("request.timeout.ms", "50");
 
         producer = new KafkaProducer<String, String>(ProducerProps);
 
@@ -233,16 +239,18 @@ public class FWQ_HiloEngineKafka extends Thread {
 			caracter++;
 		}
 
+		cadena = cadena + "MAPA DEL PARQUE\n";
 		// Creacion del mapa
 		for(int i = 0; i < 20; i++) {
 			for (int j = 0; j < 20; j++){
 				if (matriz[i][j] == null) {
-					cadena = cadena + "·";
+					cadena = cadena + " . ";
 				}
 				else {
 					// Implementado para los visitantes
 					Character aux = matriz[i][j].charAt(0);
-					if (aux.isLetter(matriz[i][j].charAt(0))) {
+					//if (aux.isLetter(matriz[i][j].charAt(0))) {
+					if (aux >= 97 && aux <= 122) {
 						// En la matriz hay un caracter (un visitante)
 						cadena = cadena + matriz[i][j];
 					}
@@ -284,6 +292,26 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		return resultado;
 	}
+
+	public void comprobarMapa(String AliasVisitor, String posX, String posY) {
+		try {
+			// Se comprueba si el usuario esta dentro del parque, si no lo esta se inserta a fwq_bbdd
+			Connection connection =  DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT * from FWQ_BBDD.Mapa WHERE Alias='" + AliasVisitor + "'");
+			if (result.next()) {
+				// Existe el usuario en la tabla mapa, no se hace nada
+			}
+			else {
+				// No existe el usuario, se inserta
+				String sentence = "INSERT INTO mapa VALUES ('" + AliasVisitor 
+					+ "', '" + posX + "', '" + posY + "')";
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("Error al manipular la tabla mapa SQL");
+		}
+	}
     
     public void procesarKafka(String topic, String key, String value) {
         // Topic muestra el ALias/ID del Visitor
@@ -297,41 +325,53 @@ public class FWQ_HiloEngineKafka extends Thread {
 			Boolean boolResult = entrarSalir(topic, value);
             if (boolResult) {
                 // El usuario esta registrado y cabe en el parque (no supera aforo), puede entrar
-                ProducerRecord<String, String> record = new ProducerRecord<String, String>(vectorResultados[2], key, "entrar");
-
-                try {
-                    producer.send(record);
-                }
-                catch(Exception e) {
-                    System.out.println("Error: " + e.toString());
-                }
+                enviarKafka(vectorResultados[2], key, "entrar");
             }
         }
+		else if (key.equals("Mov")) {
+			// Se procesa el movimiento del visitor
+			// Topic: Visitor; Key: "Mov"; Value: AliasVisitor;posX;posY;proxMov(numero);TopicConsumer
+			String resultado = "";
+			comprobarMapa(vectorResultados[0], vectorResultados[1], vectorResultados[2]);
+			mapaParque = CadenaMapa(actualizarMapa(vectorResultados[0], vectorResultados[3]));
+			// Se devuelve el mapa al visitor
+			enviarKafka(vectorResultados[4], key, mapaParque);
+		}
+		else if (key.equals("Seg")) {
+			// Se le envia al visitor el tiempo especificado
+			// Topic: Visitor; Key: "Seg"; Value: AliasVisitor;TopicConsumer
+			enviarKafka(vectorResultados[1], key, tiempoSeg.toString());
+		}
     }
+
+	public void enviarKafka(String topic, String key, String value) {
+		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+		System.out.println("Se va a enviar el mensaje de Kafka");
+		try {
+			producer.send(record);
+			System.out.println("Mensaje enviado");
+		}
+		catch(Exception e) {
+			System.out.println("Error al enviar el mensaje por Kafka. " + e.getMessage());
+		}
+	}
 
     public void run() {
         boolean continuar = true;
         Duration timeout = Duration.ofMillis(100);
         String topic = "", key = "", value = "";
 
-        try {
-            // Bucle de escucha kafka
-            while (continuar) {
-                ConsumerRecords<String, String> records = consumer.poll(timeout);
-
-                for (ConsumerRecord<String, String> record : records) {
-                    System.out.println("Se asignaran las variables recibidas por kafka");
-                    // Asignamos las variables
-                    topic = record.topic();
-                    key = record.key();
-                    value = record.value();
-
-                    procesarKafka(topic, key, value);
-                }
+        // Bucle de escucha kafka
+       while (continuar) {
+            ConsumerRecords<String, String> records = consumer.poll(timeout);
+            for (ConsumerRecord<String, String> record : records) {
+                System.out.println("Se asignaran las variables recibidas por kafka");
+                // Asignamos las variables
+                topic = record.topic();
+                key = record.key();
+                value = record.value();
+                procesarKafka(topic, key, value);
             }
-        }
-        catch (Exception e) {
-            System.out.println("Error: " + e.toString());
         }
     }
 }

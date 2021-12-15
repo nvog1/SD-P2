@@ -33,6 +33,9 @@ public class FWQ_Engine {
 			DataInputStream flujo = new DataInputStream( aux );
 			p_Datos = flujo.readUTF();
 		}
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
 		catch (Exception e)
 		{
 			System.out.println("Error: " + e.toString());
@@ -170,6 +173,8 @@ public class FWQ_Engine {
 			caracter++;
 		}
 
+		cadena = cadena + "MAPA DEL PARQUE\n";
+
 		// Creacion del mapa
 		for(int i = 0; i < 20; i++) {
 			for (int j = 0; j < 20; j++){
@@ -269,12 +274,12 @@ public class FWQ_Engine {
 				segundos = Integer.parseInt(args[5]);
 			}
 			catch(Exception e){
-				System.out.println("error al convertir par�metros");
+				System.out.println("Error al convertir par�metros");
 			}
 			
 
 			// Hilo de kafka
-			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
+			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes, segundos);
 			tKafka.start();
 
 			//conexion a wts
@@ -283,41 +288,6 @@ public class FWQ_Engine {
 			// Hilo de Sockets
 			ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 			executor.scheduleAtFixedRate(engine.sckRequest, 0, segundos, TimeUnit.SECONDS);
-
-			/*String mensaje = "";
-			ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto_wts));
-				
-			// Hilo de kafka
-			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes);
-			tKafka.start();
-
-			// Hilo de Sockets
-			for(;;){
-				Socket skCLiente = skServidor.accept();
-				System.out.println("Sirviendo cliente...");
-
-				Thread tSocket = new FWQ_HiloEngineSocket(skCLiente);
-				tSocket.start();
-				/*try{
-					FWQ_Engine engine = new FWQ_Engine();
-					Socket clientSocket = new Socket(ip_wts, Integer.parseInt(puerto_wts));
-					mensaje = "1";
-					engine.escribeSocket(clientSocket, mensaje);
-					mensaje = "";
-					mensaje = engine.leeSocket(clientSocket, mensaje);
-					//procesar mensaje
-					clientSocket.close();
-					System.out.println("Conexi�n cerrada.");
-					Thread.sleep(segundos * 1000); //el tiempo lo pide en ms
-				}
-				catch(Exception e)
-				{
-					System.out.println("Error: " + e.toString());
-				}
-
-			}*/
-
-
 		}
 		catch(Exception e)
 		{

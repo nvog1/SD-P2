@@ -11,6 +11,7 @@ public class FWQ_Visitor {
 	private static String topicConsumer;
 	private String posicionActual = "";
 	private String atraccionObjetivo;
+	long tiempoEspera = 0;
 	private static Properties ProducerProps = new Properties();
 	private static Properties ConsumerProps = new Properties();
 	private static KafkaProducer producer;
@@ -24,9 +25,12 @@ public class FWQ_Visitor {
 			DataInputStream flujo = new DataInputStream( aux );
 			p_Datos = flujo.readUTF();
 		}
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al leer el socket");
 		}
       return p_Datos;
 	}
@@ -43,9 +47,12 @@ public class FWQ_Visitor {
 			DataOutputStream flujo= new DataOutputStream( aux );
 			flujo.writeUTF(p_Datos);      
 		}
+		catch (SocketException e) {
+			System.out.println("Se ha perdido la conexion");
+		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al escribir en el socket");
 		}
 		return;
 	}
@@ -68,7 +75,7 @@ public class FWQ_Visitor {
 
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir los datos por consola");
 		}
 
 		p_Cadena = p_operacion + ";" + Alias + 
@@ -123,7 +130,7 @@ public class FWQ_Visitor {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introucir los datos por consola");
 		}
 
 		return p_resultado;
@@ -141,33 +148,59 @@ public class FWQ_Visitor {
 		return result;
 	}
 
-	public void dentroParque() {
+	public void dentroParque(String AliasVisitor) {
 		char resp = '0';
 		String mov = "";
 		Random rd = new Random();
 
-		// El visitor ya ha entrado al parque, se aplicará la lógica
+		// El visitor acaba de entrar al parque (no tiene posicion), se aplicara la logica
 		if (posicionActual.equals("")) {
 			// Se elige una posicion aleatoria
 			int posX = rd.nextInt(20);
 			int posY = rd.nextInt(20);
 			posicionActual = posX + ";" + posY;
+			System.out.println("Posicion del cliente: " + posicionActual);
 		}
-		else {
-			// Ya tiene una posicion asignada
-			// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
-			while (resp != 's') {
-				mov = proximoMov();
-				//------AQUI------//
-				//enviarKafka(producer, TopicConsumer, key, value, p_QueueHandlerHost, p_QueueHandlerPort);
+		// Ya tiene una posicion asignada
+		// bucle, mandar nuevaPos, recibir mapa, Thread.sleep(numSegundos)
+		while (/*resp != 's'*/true) {
+			String kafkaResult = "";
 
+			mov = proximoMov();
+			String topic = "Visitor", key = "Mov", value = AliasVisitor + ";" + posicionActual + ";" + mov + ";" + topicConsumer;
+			enviarKafka(topic, key, value);
+			kafkaResult = recibirKafka();
+			if (!kafkaResult.equals("entrar")) {
+				// Devuelve el mapa del parque con los otros visitantes y las atracciones
+				System.out.println(kafkaResult);
 			}
+
+			// Se para la ejecucion los segundos especificados
+			try {
+				Thread.sleep(tiempoEspera);
+			}
+			catch(Exception e) {
+				System.out.println("Error durante el tiempo de espera");
+			}
+		}
+	}
+
+	public void enviarKafka(String topic, String key, String value) {
+		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+		System.out.println("Se va a enviar el mensaje de Kafka");
+		try {
+			producer.send(record);
+			System.out.println("Mensaje enviado");
+		}
+		catch(Exception e) {
+			System.out.println("Error al enviar el mensaje por Kafka. " + e.getMessage());
 		}
 	}
 
 	public String recibirKafka() {
 		String result = "", topic = "", key = "", value = "";
         Duration timeout = Duration.ofMillis(100);
+		boolean continuar = true;
 
 		try {
             // Bucle de escucha kafka
@@ -182,10 +215,10 @@ public class FWQ_Visitor {
                     topic = record.topic();
                     key = record.key();
                     value = record.value();
-                    System.out.println("Mensaje recibido por Kafka -> " + 
+                    System.out.println("Mensaje recibido por Kafka desde el motor -> " + 
 						"Topic: " + topic + "; Key: " + key + "; Value: " + value);
 					
-					result = value;
+					return value;
                 }
             }
         }
@@ -199,6 +232,8 @@ public class FWQ_Visitor {
 	public Void entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
+		String kafkaResult = "";
+		String topic = "", key = "", value = "";
 		boolean visitorExists = false;
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
@@ -208,27 +243,31 @@ public class FWQ_Visitor {
 			AliasVisitor = br.readLine();
 			System.out.println("Introduzca su contrasenya: ");
 			PWVisitor = br.readLine();
+			
+			// Segundos especificados en argumentos al ejecutar
+			if (tiempoEspera == 0) {
+				topic = "Visitor";
+				key = "Seg";
+				value = AliasVisitor + ";" + topicConsumer;
+				enviarKafka(topic, key, value);
+				kafkaResult = recibirKafka();
+				tiempoEspera = Integer.parseInt(kafkaResult) * 1000;
+				System.out.println("Tiempo asignado");
+			}
 
 			// Consulta si el usuario esta registrado
-			String topic = "Visitor", key = "entrarSalir", value = "entrar;" + AliasVisitor + ";" + topicConsumer;
-			//enviarKafka(producer, "Visitor", "entrarSalir", "entrar;" + AliasVisitor + ";" + topicConsumer, p_QueueHandlerHost, p_QueueHandlerPort);
-			ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
-			System.out.println("Se va a enviar el mensaje de Kafka");
-			try {
-				// Aqui hay un warning que podemos obviar
-				producer.send(record);
-				System.out.println("Mensaje enviado");
-				entrarResult = recibirKafka();
-				if (entrarResult.equals("entrar")) {
-					dentroParque();
-				}
-			}
-			catch(Exception e) {
-				System.out.println("Error: " + e.toString());
+			topic = "Visitor";
+			key = "entrarSalir";
+			value = "entrar;" + AliasVisitor + ";" + topicConsumer;
+			enviarKafka(topic, key, value);
+			kafkaResult = recibirKafka();
+			System.out.println("Proceso de entrada hecho");
+			if (kafkaResult.equals("entrar")) {
+				dentroParque(AliasVisitor);
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir datos por consola. " + e.getMessage());
 		}
 	}
 
@@ -295,7 +334,7 @@ public class FWQ_Visitor {
 					// resp marca si el visitante quiere hacer alguna operacion mas
 					resp = 'x';
 					while (resp != 's' && resp != 'n') {
-						System.out.println("¿Desea realizar alguna operacion mas? (s, n)");
+						System.out.println("Desea realizar alguna operacion mas? (s, n)");
 						resp = br.readLine().charAt(0);
 					}
 					if (resp != 's') {
@@ -336,7 +375,7 @@ public class FWQ_Visitor {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir los datos por consola");
 		}
 	}
 
@@ -362,7 +401,7 @@ public class FWQ_Visitor {
 			}
 		}
 		catch(Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al introducir los datos por consola");
 		}
 	}
 
@@ -393,6 +432,10 @@ public class FWQ_Visitor {
 		FWQ_Visitor.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
 		FWQ_Visitor.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
 		FWQ_Visitor.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		FWQ_Visitor.ProducerProps.put("max.block.ms", "1000");
+		FWQ_Visitor.ProducerProps.put("delivery.timeout.ms", "1900");
+		FWQ_Visitor.ProducerProps.put("linger.ms", "0");
+		FWQ_Visitor.ProducerProps.put("request.timeout.ms", "50");
         FWQ_Visitor.producer = new KafkaProducer<String, String>(FWQ_Visitor.ProducerProps);
 
 		// Kafka Consumer
