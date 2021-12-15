@@ -306,6 +306,9 @@ public class FWQ_HiloEngineKafka extends Thread {
 				// No existe el usuario, se inserta
 				String sentence = "INSERT INTO mapa VALUES ('" + AliasVisitor 
 					+ "', '" + posX + "', '" + posY + "')";
+				statement.executeUpdate(sentence);
+				System.out.println("Usuario insertado en el mapa");
+				statement.close();
 			}
 		}
 		catch (SQLException e) {
@@ -346,7 +349,8 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 	public void enviarKafka(String topic, String key, String value) {
 		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
-		System.out.println("Se va a enviar el mensaje de Kafka");
+		System.out.println("\n----------------------------------\n" + 
+			"Se va a enviar el mensaje de Kafka");
 		try {
 			producer.send(record);
 			System.out.println("Mensaje enviado");

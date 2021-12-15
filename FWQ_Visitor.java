@@ -10,7 +10,8 @@ import org.apache.kafka.clients.consumer.*;
 public class FWQ_Visitor {
 	private static String topicConsumer;
 	private String posicionActual = "";
-	private String atraccionObjetivo;
+	// atraccionObjetivo: ID; posX; posY; tiempoEspera; TiempoCiclo
+	private String atraccionObjetivo = "";
 	long tiempoEspera = 0;
 	private static Properties ProducerProps = new Properties();
 	private static Properties ConsumerProps = new Properties();
@@ -136,14 +137,180 @@ public class FWQ_Visitor {
 		return p_resultado;
 	}
 
+	public void seleccionarAtraccion(String cadenaAtracciones) {
+		String[] lineaAtraccion = cadenaAtracciones.split("\n");
+		Interger numRandom = -1;
+		Random rd = new Random();
+		boolean continuar = true;
+
+		do {
+			numRandom = rd.nextInt(lineaAtraccion.length);
+			String[] datosAtraccion = lineaAtraccion[numRandom].split(";");
+			if (Integer.parseint(datosAtraccion[3]) < 60) {
+				// Se cumple la condicion de atraccionObjetivo
+				atraccionObjetivo = lineaAtraccion[numRandom];
+				continuar = false;
+			}
+		} while(continuar);
+
+	}
+
+	public Integer contAbajo(int origen, int destino) {
+		int contador = 0;
+		int origenAux = origen;
+
+		while (origenAux != destino) {
+			contador++;
+			origenAux--;
+			if (origenAux < 0) {
+				// Pasa de 0 a 19
+				origenAux = 19;
+			}
+		}
+
+		return contador * -1;
+	}
+
+	public Integer contArriba(int origen, int destino) {
+		int contador = 0;
+		int origenAux = origen;
+
+		while (origenAux != destino) {
+			contador++;
+			origenAux++;
+			if (origenAux > 19) {
+				// Pasa de 19 a 0
+				origenAux = 0;
+			}
+		}
+
+		return contador;
+	}
+
+	public String movToAtraccion() {
+		// Se movera de la posicion actual a la posicion de atraccion objetivo
+		//posicionActual(posX;posY) y atraccionObjetivo(posX;posY)
+		int xCircular, x, yCircular, y;
+		int atraccionX, atraccionY, visitorX, visitorY;
+		int movX, movY;
+		String result = "";
+
+		String[] atraccion = atraccionObjetivo.split(";");
+		String[] visitor = posicionActual.split(";");
+
+		atraccionX = atraccion[1];
+		atraccionY = atraccion[2];
+		visitorX = visitor[0];
+		visitorY = visitor[1];
+
+		xCircular = /*-1 * (visitorX + (19 - atraccionX) + 1)*/contAbajo(visitorX, atraccionX);
+		yCircular = /*-1 * (visitorY + (19 - atraccionY) + 1)*/contAbajo(visitorY, atraccionY);
+		x = /*abs(atraccionX - visitorX)*/contArriba(visitorX, atraccionX);
+		y = /*abs(atraccionY - atraccionX)*/contArriba(visitorY, atraccionY);
+
+		// Cogemos el menor componente de cada eje, diferenciamos usando negativos
+		if (x <= abs(xCircular)) {
+			movX = x;
+		}
+		else {
+			movX = xCircular;
+		}
+		if (y <= abs(yCircular)) {
+			movY = y;
+		}
+		else {
+			movY = yCircular;
+		}
+
+		if (movX < 0) {
+			// Se ira hacia el Oeste
+			if (movY < 0) {
+				// Noroeste
+				result = "8";
+			}
+			else if (movY > 0) {
+				// Suroeste
+				result = "6";
+			}
+			else {
+				// Oeste
+				result = "7";
+			}
+		}
+		else if (movX > 0) {
+			// Se ira hacia el Este
+			if (movY < 0) {
+				// Noreste
+				result = "2";
+			}
+			else if (movY > 0) {
+				// Sureste
+				result = "4";
+			}
+			else {
+				// Este
+				result = "3";
+			}
+		}
+		else {
+			// movX = 0, va hacia Norte o Sur
+			if (movY < 0) {
+				// Norte
+				reuslt = "1";
+			}
+			else if (movY > 0) {
+				// Sur
+				result = "5";
+			}
+			else {
+				// movX = 0; movY = 0; destino
+				result = "0";
+			}
+		}
+	}
+
 	public String proximoMov() {
 		String result = "";
-		Random rd = new Random();
+		String topic = "Visitor", key = "Atracciones", value = "Cadena";
+		String kafkaResult = "";
+		String atraccionAux = "";
+		/*Random rd = new Random();
 
 		Integer num = rd.nextInt(8) + 1;
 		// Norte = 1; Noreste = 2; Este = 3; Sureste = 4; 
 		// Sur = 5; Suroeste = 6; Oeste = 7; Noroeste = 8
-		result = num.toString();
+		result = num.toString();*/
+
+		enviarKafka(topic, key, value);
+		// kafkaResult tiene una lista de atracciones almacenadas como String:
+		// ID;posX;posY;tiempoEspera;tiempoCiclo
+		kafkaResult = recibirKafka();
+		// Se comprueba si la atraccionActual sigue cumpliendo que tiempoEspera < 60
+		String[] lineaAtraccion = kafkaResult.split("\n");
+		if (!atraccionObjetivo.equals("")) {
+			// Ya tiene una atraccionObjetivo
+			String[] datosAtraccion = atraccionObjetivo.split(";");
+			for (String linea: lineaAtraccion) {
+				String[] vectorResultados = kafkaResult.split(";");
+				if (vectorResultados[0].equals(datosAtraccion[0])) {
+					// Se ha encontrado la linea de la atraccion, se comprueba si sigue tiempoEspera < 60
+					if (Integer.parseInt(vectorResultados[3]) < 60) {
+						// Sigue cumpliendo la condicion, sigue dirigiendose a esa atraccion
+					}
+					else {
+						// Se selecciona una nueva atraccionObjetivo
+						seleccionarAtraccion(kafkaResult);
+					}
+				}
+			}
+		}
+		else {
+			// Se selecciona una nueva atraccionObjetivo
+			seleccionarAtraccion(kafkaResult);
+		}
+
+		// AtraccionObjetivo seleccionada, movimiento hacia ella
+		result = movToAtraccion();
 
 		return result;
 	}
@@ -178,6 +345,11 @@ public class FWQ_Visitor {
 			// Se para la ejecucion los segundos especificados
 			try {
 				Thread.sleep(tiempoEspera);
+				if (mov.equals("0")) {
+					// Esta en el destino
+					String[] datosAtraccion = atraccionObjetivo.split(";");
+					Thread.sleep(datosAtraccion[4]);
+				}
 			}
 			catch(Exception e) {
 				System.out.println("Error durante el tiempo de espera");
@@ -187,7 +359,8 @@ public class FWQ_Visitor {
 
 	public void enviarKafka(String topic, String key, String value) {
 		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
-		System.out.println("Se va a enviar el mensaje de Kafka");
+		System.out.println("\n----------------------------------\n" + 
+			"Se va a enviar el mensaje de Kafka");
 		try {
 			producer.send(record);
 			System.out.println("Mensaje enviado");
