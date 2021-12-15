@@ -193,7 +193,7 @@ public class FWQ_Visitor {
 			System.out.println("Mensaje enviado");
 		}
 		catch(Exception e) {
-			System.out.println("Error al enviar el mensaje por Kafka");
+			System.out.println("Error al enviar el mensaje por Kafka. " + e.getMessage());
 		}
 	}
 
@@ -244,14 +244,16 @@ public class FWQ_Visitor {
 			System.out.println("Introduzca su contrasenya: ");
 			PWVisitor = br.readLine();
 			
-			// Segundos especificados en argumentos a lejecutar
-			topic = "Visitor";
-			key = "Seg";
-			value = AliasVisitor + ";" + topicConsumer;
-			enviarKafka(topic, key, value);
-			kafkaResult = recibirKafka();
-			tiempoEspera = Integer.parseInt(kafkaResult) * 1000;
-			System.out.println("Tiempo asignado");
+			// Segundos especificados en argumentos al ejecutar
+			if (tiempoEspera == 0) {
+				topic = "Visitor";
+				key = "Seg";
+				value = AliasVisitor + ";" + topicConsumer;
+				enviarKafka(topic, key, value);
+				kafkaResult = recibirKafka();
+				tiempoEspera = Integer.parseInt(kafkaResult) * 1000;
+				System.out.println("Tiempo asignado");
+			}
 
 			// Consulta si el usuario esta registrado
 			topic = "Visitor";
@@ -265,7 +267,7 @@ public class FWQ_Visitor {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error al introducir datos por consola");
+			System.out.println("Error al introducir datos por consola. " + e.getMessage());
 		}
 
 		return resultado;
@@ -432,6 +434,10 @@ public class FWQ_Visitor {
 		FWQ_Visitor.ProducerProps.put("bootstrap.servers", QueueHandlerHost + ":" + QueueHandlerPort);
 		FWQ_Visitor.ProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); 
 		FWQ_Visitor.ProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		FWQ_Visitor.ProducerProps.put("max.block.ms", "1000");
+		FWQ_Visitor.ProducerProps.put("delivery.timeout.ms", "1900");
+		FWQ_Visitor.ProducerProps.put("linger.ms", "0");
+		FWQ_Visitor.ProducerProps.put("request.timeout.ms", "50");
         FWQ_Visitor.producer = new KafkaProducer<String, String>(FWQ_Visitor.ProducerProps);
 
 		// Kafka Consumer

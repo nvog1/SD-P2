@@ -29,6 +29,10 @@ public class FWQ_HiloEngineKafka extends Thread {
         this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
         this.ProducerProps.put("value.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
+		this.ProducerProps.put("max.block.ms", "1000");
+		this.ProducerProps.put("delivery.timeout.ms", "1900");
+		this.ProducerProps.put("linger.ms", "0");
+		this.ProducerProps.put("request.timeout.ms", "50");
 
         producer = new KafkaProducer<String, String>(ProducerProps);
 
@@ -347,7 +351,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			System.out.println("Mensaje enviado");
 		}
 		catch(Exception e) {
-			System.out.println("Error al enviar el mensaje por Kafkas");
+			System.out.println("Error al enviar el mensaje por Kafka. " + e.getMessage());
 		}
 	}
 
