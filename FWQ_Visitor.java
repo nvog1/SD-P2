@@ -229,7 +229,7 @@ public class FWQ_Visitor {
 		return result;
 	}
 
-	public Void entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
+	public void entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
 		String AliasVisitor = "";
 		String PWVisitor = "";
 		String kafkaResult = "";
