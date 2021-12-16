@@ -390,8 +390,6 @@ public class FWQ_Visitor {
                     topic = record.topic();
                     key = record.key();
                     value = record.value();
-                    System.out.println("Mensaje recibido por Kafka desde el motor -> " + 
-						"Topic: " + topic + "; Key: " + key + "; Value: " + value);
 					
 					return value;
                 }
