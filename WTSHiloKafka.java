@@ -42,7 +42,7 @@ public class WTSHiloKafka extends Thread {
 				for (ConsumerRecord<String, Integer> record : records) {
 
 					System.out.println("Atraccion: " + record.key() + ". Personas: " + record.value().toString());
-					//l�gica del hilokafka	
+					//logica del hilokafka	
 					//actualizo el valor "personas" en la bbdd
 					try{
 						BufferedReader bufrd = new BufferedReader(new FileReader("C:\\kafka\\SD-P2\\atracciones.txt"));
