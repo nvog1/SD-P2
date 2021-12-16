@@ -83,6 +83,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			while (result.next()) {
 				resultado++;
 			}
+			statement.close();
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
@@ -91,8 +92,41 @@ public class FWQ_HiloEngineKafka extends Thread {
         return resultado;
     }
 
+	public Boolean ConsultarMapaSQL(String AliasVisitor) {
+		Boolean boolResult = false;
+
+		try {
+			Connection connection =  DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT * from FWQ_BBDD.Mapa WHERE Alias='" + AliasVisitor + "'");
+			// Se procesan los resultados obtenidos y modifica el alias
+			if (result.next()) {
+				boolResult = true;
+			}
+			statement.close();
+		}
+		catch (SQLException e) {
+			System.out.println("Error al consultar el mapa SQL");
+		}
+
+		return boolResult;
+	}
+
+	public void eliminarMapaSQL(String Alias) {
+		try {
+			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			Statement statement = connection.createStatement();
+			String sentence = "DELETE FROM fwq_bbdd.mapa WHERE Alias='" + Alias + "'";
+			statement.executeUpdate(sentence);
+			statement.close();
+		}
+		catch (SQLException e) {
+			System.out.println("Error al eliminar el visitante de mapa SQL");
+		}
+	}
+
     // Comprueba si el Alias/ID esta registrado
-    public boolean entrarSalir(String topic, String value) {
+    public boolean entrar(String topic, String value) {
         Boolean op1 = false, op2 = false;
         Boolean result = false;
         String[] vectorResultados = value.split(";");
@@ -122,11 +156,30 @@ public class FWQ_HiloEngineKafka extends Thread {
                 System.out.println("El aforo del parque acepta al visitante");
                 op2 = true;
             }
+			result = (op1 && op2);
         }
 
-        result = (op1 && op2);
         return result;
     }
+
+	public Boolean salir(String topic, String value) {
+        Boolean result = false;
+        String[] vectorResultados = value.split(";");
+
+		if (vectorResultados[0].equals("salir")) {
+			// El usuario quiere salir del parque
+
+			System.out.println("El usuario " + vectorResultados[1] + " quiere salir del parque");
+			result = ConsultarMapaSQL(vectorResultados[1]);
+			if (result) {
+				// Se elimina del mapa
+				eliminarMapaSQL(vectorResultados[1]);
+				System.out.println("El usuario se ha eliminado del mapa");
+			}
+		}
+
+		return result;
+	}
 
 	// Funcion auxiliar para calcular la nueva posicion del visitante
 	public String calculaPos(String posicion, String direccion) {
@@ -205,8 +258,8 @@ public class FWQ_HiloEngineKafka extends Thread {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             Statement statement = connection.createStatement();
-            String sentence = "UPDATE Mapa SET PosX = " + Integer.parseInt(vectorResultados[0] + 
-				", PosY = " + Integer.parseInt(vectorResultados[1]) + " WHERE Alias = '" + Alias + "'");
+            String sentence = "UPDATE Mapa SET PosX = " + Integer.parseInt(vectorResultados[0]) + 
+				", PosY = " + Integer.parseInt(vectorResultados[1]) + " WHERE Alias = '" + Alias + "'";
 
 			statement.executeUpdate(sentence);
 			statement.close();
@@ -223,6 +276,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 		Set<String> AliasMapa = mapa.keySet();
 		// Matriz que representa el mapa [x][y]
 		String[][] matriz = new String[20][20];
+		String atracciones = "";
 
 		
 		cadena = "Leyenda del mapa\n" + 
@@ -240,9 +294,24 @@ public class FWQ_HiloEngineKafka extends Thread {
 		}
 
 		cadena = cadena + "MAPA DEL PARQUE\n";
+		// cadena de varias lineas: ID; posX; posY; tiempoEspera; tiempoCiclo
+		atracciones = FWQ_Engine.getAtracciones();
+		String[] lineaAtracciones = atracciones.split("\n");
+		Boolean boolAtraccion = false;
 		// Creacion del mapa
-		for(int i = 0; i < 20; i++) {
-			for (int j = 0; j < 20; j++){
+		for(Integer i = 0; i < 20; i++) {
+			// Para cada Y del eje
+			for (Integer j = 0; j < 20; j++){
+				// Para cada X del eje
+				for (int k = 0; k < lineaAtracciones.length && !boolAtraccion; k++) {
+					// Comprueba si en la posicion xy hay una atraccion
+					String[] datosAtraccion = lineaAtracciones[k].split(";");
+					if (j.equals(Integer.parseInt(datosAtraccion[1])) && i.equals(Integer.parseInt(datosAtraccion[2]))) {
+						boolAtraccion = true;
+						// Se añade el tiempo de espera al mapa
+						cadena = cadena + datosAtraccion[3];
+					}
+				}
 				if (matriz[i][j] == null) {
 					cadena = cadena + " . ";
 				}
@@ -306,6 +375,9 @@ public class FWQ_HiloEngineKafka extends Thread {
 				// No existe el usuario, se inserta
 				String sentence = "INSERT INTO mapa VALUES ('" + AliasVisitor 
 					+ "', '" + posX + "', '" + posY + "')";
+				statement.executeUpdate(sentence);
+				System.out.println("Usuario insertado en el mapa");
+				statement.close();
 			}
 		}
 		catch (SQLException e) {
@@ -320,14 +392,22 @@ public class FWQ_HiloEngineKafka extends Thread {
         String[] vectorResultados = value.split(";");
 
         System.out.println("Topic: " + topic + "; Key: " + key + "; Value: " + vectorResultados[0]);
-        if (key.equals("entrarSalir")) {
-            // Se quiere entrar (value == "0") o salir (value == "1")
-			Boolean boolResult = entrarSalir(topic, value);
+        if (key.equals("entrar")) {
+            // Se quiere entrar 
+			Boolean boolResult = entrar(topic, value);
             if (boolResult) {
                 // El usuario esta registrado y cabe en el parque (no supera aforo), puede entrar
                 enviarKafka(vectorResultados[2], key, "entrar");
             }
         }
+		else if (key.equals("salir")) {
+			// Se quiere salir
+			Boolean boolResult = salir(topic, value);
+            if (boolResult) {
+                // El usuario estaba en el mapa, se ha eliminado
+                enviarKafka(vectorResultados[2], key, "salir");
+            }
+		}
 		else if (key.equals("Mov")) {
 			// Se procesa el movimiento del visitor
 			// Topic: Visitor; Key: "Mov"; Value: AliasVisitor;posX;posY;proxMov(numero);TopicConsumer
@@ -342,11 +422,16 @@ public class FWQ_HiloEngineKafka extends Thread {
 			// Topic: Visitor; Key: "Seg"; Value: AliasVisitor;TopicConsumer
 			enviarKafka(vectorResultados[1], key, tiempoSeg.toString());
 		}
+		else if (key.equals("Atracciones")) {
+			String atracciones = FWQ_Engine.getAtracciones();
+			enviarKafka(vectorResultados[1], key, atracciones);
+		}
     }
 
 	public void enviarKafka(String topic, String key, String value) {
 		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
-		System.out.println("Se va a enviar el mensaje de Kafka");
+		System.out.println("\n----------------------------------\n" + 
+			"Se va a enviar el mensaje de Kafka");
 		try {
 			producer.send(record);
 			System.out.println("Mensaje enviado");

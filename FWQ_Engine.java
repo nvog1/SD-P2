@@ -17,6 +17,7 @@ public class FWQ_Engine {
     private static final String PASSWORD = "1234";
 	private static String ipWTS;
 	private static Integer puertoWTS;
+	// En atracciones se guarda: ID; posX; posY; tiempoEspera; tiempoCiclo
 	private static String atracciones;
 
 
@@ -246,6 +247,10 @@ public class FWQ_Engine {
 			
 		}
 	};
+
+	public static String getAtracciones() {
+		return atracciones;
+	}
 
 	/**
 	 * @param args
