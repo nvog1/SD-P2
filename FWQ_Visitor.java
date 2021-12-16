@@ -139,14 +139,14 @@ public class FWQ_Visitor {
 
 	public void seleccionarAtraccion(String cadenaAtracciones) {
 		String[] lineaAtraccion = cadenaAtracciones.split("\n");
-		Interger numRandom = -1;
+		Integer numRandom = -1;
 		Random rd = new Random();
 		boolean continuar = true;
 
 		do {
 			numRandom = rd.nextInt(lineaAtraccion.length);
 			String[] datosAtraccion = lineaAtraccion[numRandom].split(";");
-			if (Integer.parseint(datosAtraccion[3]) < 60) {
+			if (Integer.parseInt(datosAtraccion[3]) < 60) {
 				// Se cumple la condicion de atraccionObjetivo
 				atraccionObjetivo = lineaAtraccion[numRandom];
 				continuar = false;
@@ -198,10 +198,10 @@ public class FWQ_Visitor {
 		String[] atraccion = atraccionObjetivo.split(";");
 		String[] visitor = posicionActual.split(";");
 
-		atraccionX = atraccion[1];
-		atraccionY = atraccion[2];
-		visitorX = visitor[0];
-		visitorY = visitor[1];
+		atraccionX = Integer.parseInt(atraccion[1]);
+		atraccionY = Integer.parseInt(atraccion[2]);
+		visitorX = Integer.parseInt(visitor[0]);
+		visitorY = Integer.parseInt(visitor[1]);
 
 		xCircular = /*-1 * (visitorX + (19 - atraccionX) + 1)*/contAbajo(visitorX, atraccionX);
 		yCircular = /*-1 * (visitorY + (19 - atraccionY) + 1)*/contAbajo(visitorY, atraccionY);
@@ -209,13 +209,13 @@ public class FWQ_Visitor {
 		y = /*abs(atraccionY - atraccionX)*/contArriba(visitorY, atraccionY);
 
 		// Cogemos el menor componente de cada eje, diferenciamos usando negativos
-		if (x <= abs(xCircular)) {
+		if (x <= Math.abs(xCircular)) {
 			movX = x;
 		}
 		else {
 			movX = xCircular;
 		}
-		if (y <= abs(yCircular)) {
+		if (y <= Math.abs(yCircular)) {
 			movY = y;
 		}
 		else {
@@ -256,7 +256,7 @@ public class FWQ_Visitor {
 			// movX = 0, va hacia Norte o Sur
 			if (movY < 0) {
 				// Norte
-				reuslt = "1";
+				result = "1";
 			}
 			else if (movY > 0) {
 				// Sur
@@ -267,11 +267,13 @@ public class FWQ_Visitor {
 				result = "0";
 			}
 		}
+
+		return result;
 	}
 
 	public String proximoMov() {
 		String result = "";
-		String topic = "Visitor", key = "Atracciones", value = "Cadena";
+		String topic = "Visitor", key = "Atracciones", value = "Cadena;" + topicConsumer;
 		String kafkaResult = "";
 		String atraccionAux = "";
 		/*Random rd = new Random();
@@ -348,7 +350,7 @@ public class FWQ_Visitor {
 				if (mov.equals("0")) {
 					// Esta en el destino
 					String[] datosAtraccion = atraccionObjetivo.split(";");
-					Thread.sleep(datosAtraccion[4]);
+					Thread.sleep(Integer.parseInt(datosAtraccion[4]));
 				}
 			}
 			catch(Exception e) {
@@ -402,7 +404,7 @@ public class FWQ_Visitor {
 		return result;
 	}
 
-	public void entrarParque(String op, String resultado, String p_QueueHandlerHost, String p_QueueHandlerPort) {
+	public void entrarParque() {
 		String AliasVisitor = "";
 		String PWVisitor = "";
 		String kafkaResult = "";
@@ -430,7 +432,7 @@ public class FWQ_Visitor {
 
 			// Consulta si el usuario esta registrado
 			topic = "Visitor";
-			key = "entrarSalir";
+			key = "entrar";
 			value = "entrar;" + AliasVisitor + ";" + topicConsumer;
 			enviarKafka(topic, key, value);
 			kafkaResult = recibirKafka();
@@ -444,11 +446,29 @@ public class FWQ_Visitor {
 		}
 	}
 
-	public String salirParque() {
-		
-	//-----------//
-	return "";
-	//-----------//
+	public void salirParque() {
+		String AliasVisitor = "", PWVisitor = "";
+		String topic = "", key = "", value = "";
+		String kafkaResult = "";
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader br = new BufferedReader(isr);
+
+		try {
+			System.out.println("Introduzca su Alias/ID: ");
+			AliasVisitor = br.readLine();
+			System.out.println("Introduzca su contrasenya: ");
+			PWVisitor = br.readLine();
+
+			// Comprobamos si esta en el mapa (si esta en el mapa esta registrado)
+			topic = "Visitor";
+			key = "salir";
+			value = "salir;" + AliasVisitor + ";" + topicConsumer;
+			enviarKafka(topic, key, value);
+			kafkaResult = recibirKafka();
+		}
+		catch (IOException e ) {
+			System.out.println("Error al introducir datos por consola");
+		}
 	}
 
 	// El visitante podra registrarse, modificar sus datos, entrar al parque, salir del parque...
@@ -526,20 +546,12 @@ public class FWQ_Visitor {
 					// El visitante quiere entrar o salir del parque
 					if (operacion == 3) {
 						// Se quiere entrar al parque
-						entrarParque(op, resultado, p_QueueHandlerHost, p_QueueHandlerPort);
+						entrarParque();
 						salir = 1;
 					}
 					else if (operacion == 4) {
-						// TODO implementar salirParque
-						//salirParque(op,resutado, p_QueueHandlerHost, p_QueueHandlerPort);
-						/*escribeSocket(skRegistro, "fin");
-						cadena = leeSocket(skRegistro, cadena);
-						if (cadena == "fin") {
-							skRegistro.close();
-							System.out.println("Conexion cerrada");
-							System.exit(0);
-						}
-						System.out.println("Saliendo del parque...");*/
+						salirParque();
+						System.out.println("Saliendo del parque...");
 						salir = 1;
 					}
 				}

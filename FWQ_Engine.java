@@ -248,6 +248,10 @@ public class FWQ_Engine {
 		}
 	};
 
+	public static String getAtracciones() {
+		return atracciones;
+	}
+
 	/**
 	 * @param args
 	 */
