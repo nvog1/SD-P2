@@ -34,7 +34,7 @@ public class FWQ_Sensor {
 
 	Runnable envioKafka = new Runnable() {
 		public void run() {
-			//revisar simulación llegada para hacerla más realista
+
 			Random rd = new Random();
 			personas = rd.nextInt(50);
 			ProducerRecord<String, Integer> record = new ProducerRecord<>("Sensores", id, personas);
@@ -73,8 +73,12 @@ public class FWQ_Sensor {
 
 		sensor.producer = new KafkaProducer<String, Integer>(kafkaProps);
 
+		Random rd = new Random();
+		int segundos;
+		segundos = rd.nextInt(3) + 1;
+
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-		executor.scheduleAtFixedRate(sensor.envioKafka, 0, 3, TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(sensor.envioKafka, 0, segundos, TimeUnit.SECONDS);
 		
 		
 	}
