@@ -245,6 +245,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 		}
 
 		resultado = x + ";" + y;
+		System.out.println("Nueva posicion calculada: " + resultado);
 		return resultado;
 	}
 
@@ -277,7 +278,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 		// Matriz que representa el mapa [x][y]
 		String[][] matriz = new String[20][20];
 		String atracciones = "";
-
+		Random rd = new Random();
 		
 		cadena = "Leyenda del mapa\n" + 
 			"Caracter\tID\tPos\n";
@@ -295,15 +296,15 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		cadena = cadena + "MAPA DEL PARQUE\n";
 		// cadena de varias lineas: ID; posX; posY; tiempoEspera; tiempoCiclo
-		atracciones = FWQ_Engine.getAtracciones();
+		/*atracciones = FWQ_Engine.getAtracciones();
 		String[] lineaAtracciones = atracciones.split("\n");
-		Boolean boolAtraccion = false;
+		Boolean boolAtraccion = false;*/
 		// Creacion del mapa
 		for(Integer i = 0; i < 20; i++) {
 			// Para cada Y del eje
 			for (Integer j = 0; j < 20; j++){
 				// Para cada X del eje
-				for (int k = 0; k < lineaAtracciones.length && !boolAtraccion; k++) {
+				/*for (int k = 0; k < lineaAtracciones.length && !boolAtraccion; k++) {
 					// Comprueba si en la posicion xy hay una atraccion
 					String[] datosAtraccion = lineaAtracciones[k].split(";");
 					if (j.equals(Integer.parseInt(datosAtraccion[1])) && i.equals(Integer.parseInt(datosAtraccion[2]))) {
@@ -311,8 +312,17 @@ public class FWQ_HiloEngineKafka extends Thread {
 						// Se añade el tiempo de espera al mapa
 						cadena = cadena + datosAtraccion[3];
 					}
+				}*/
+				if (j.equals(5) && i.equals(2)) {
+					cadena = cadena + rd.nextInt(79)+1;
 				}
-				if (matriz[i][j] == null) {
+				else if (j.equals(10) && i.equals(3)) {
+					cadena = cadena + rd.nextInt(79)+1;
+				}
+				else if (j.equals(7) && i.equals(2)) {
+					cadena = cadena + rd.nextInt(79)+1;
+				}
+				else if (matriz[i][j] == null) {
 					cadena = cadena + " . ";
 				}
 				else {
@@ -321,7 +331,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 					//if (aux.isLetter(matriz[i][j].charAt(0))) {
 					if (aux >= 97 && aux <= 122) {
 						// En la matriz hay un caracter (un visitante)
-						cadena = cadena + matriz[i][j];
+						cadena = cadena + " " + matriz[i][j] + " ";
 					}
 				}
 			}
@@ -345,7 +355,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 				String AliasMap = result.getString("Alias");
 				String posMap = result.getInt("PosX") + ";" + result.getInt("PosY");
 				
-				if (AliasMap == Alias) {
+				if (AliasMap.equals(Alias)) {
 					// Es el usuario que queremos actualizar
 					posMap = calculaPos(posMap, direccion);
 				
@@ -424,6 +434,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 		}
 		else if (key.equals("Atracciones")) {
 			String atracciones = FWQ_Engine.getAtracciones();
+			System.out.println(atracciones);
 			enviarKafka(vectorResultados[1], key, atracciones);
 		}
     }

@@ -273,15 +273,17 @@ public class FWQ_Visitor {
 
 	public String proximoMov() {
 		String result = "";
-		String topic = "Visitor", key = "Atracciones", value = "Cadena;" + topicConsumer;
-		String kafkaResult = "";
-		String atraccionAux = "";
-		/*Random rd = new Random();
+		Random rd = new Random();
 
 		Integer num = rd.nextInt(8) + 1;
 		// Norte = 1; Noreste = 2; Este = 3; Sureste = 4; 
 		// Sur = 5; Suroeste = 6; Oeste = 7; Noroeste = 8
-		result = num.toString();*/
+		result = num.toString();
+
+		/*String result = "";
+		String topic = "Visitor", key = "Atracciones", value = "Cadena;" + topicConsumer;
+		String kafkaResult = "";
+		String atraccionAux = "";
 
 		enviarKafka(topic, key, value);
 		// kafkaResult tiene una lista de atracciones almacenadas como String:
@@ -312,7 +314,7 @@ public class FWQ_Visitor {
 		}
 
 		// AtraccionObjetivo seleccionada, movimiento hacia ella
-		result = movToAtraccion();
+		result = movToAtraccion();*/
 
 		return result;
 	}
@@ -339,10 +341,8 @@ public class FWQ_Visitor {
 			String topic = "Visitor", key = "Mov", value = AliasVisitor + ";" + posicionActual + ";" + mov + ";" + topicConsumer;
 			enviarKafka(topic, key, value);
 			kafkaResult = recibirKafka();
-			if (!kafkaResult.equals("entrar")) {
-				// Devuelve el mapa del parque con los otros visitantes y las atracciones
-				System.out.println(kafkaResult);
-			}
+			// Devuelve el mapa del parque con los otros visitantes y las atracciones
+			System.out.println(kafkaResult);
 
 			// Se para la ejecucion los segundos especificados
 			try {
