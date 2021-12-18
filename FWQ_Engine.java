@@ -16,6 +16,10 @@ public class FWQ_Engine {
 	private static Integer puertoWTS;
 	// En atracciones se guarda: ID; posX; posY; tiempoEspera; tiempoCiclo
 	private static volatile String atracciones;
+	
+    private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
 
 
 	/*
@@ -60,6 +64,76 @@ public class FWQ_Engine {
 		return;
 	}
 
+	public boolean consultarAtraccion(String IdAtraccion) {
+		boolean resultado = false;
+
+		try {
+			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            Statement statement = connection.createStatement();
+            String sentence = "SELECT * FROM fwq_atracciones WHERE ID = " + Integer.parseInt(idAtraccion) + "'";
+			ResultSet result = statement.executeQuery(sentence);
+			if (result.next()) {
+				resultado = true;
+			}
+			statement.close();
+		}
+		catch (SQLException e) {
+			System.out.println("Error SQL al consultar la atraccion " + idAtraccion);
+		}
+
+		return resultado;
+	}
+
+	public void actualizarAtraccion(String ID, String posX, String posY, String tiempoEspera, String tiempoCiclo) {
+		try {
+			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            Statement statement = connection.createStatement();
+            String sentence = "UPDATE fwq_atracciones SET posX=" + Integer.parseInt(posX) + ", posY=" + Integer.parseint(posY) + 
+				", tiempoEspera=" + Integer.parseInt(tiempoEspera) + ", tiempoCiclo=" + Integer.parseInt(tiempoCiclo) + 
+				" WHERE ID=" + Integer.parseInt(ID);
+			statement.executeUpdate(sentence);
+			statement.close();
+		}
+		catch (SQLException e) {
+			System.out.println("Error SQL al actualizar la atraccion " + ID);
+		}
+	}
+
+	public void insertarAtraccion(String ID, String posX, String posY, String tiempoEspera, String tiempoCiclo) {
+		try {
+			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            Statement statement = connection.createStatement();
+            String sentence = "INSERT INTO fwq_atracciones VALUES (" + Integer.parseInt(ID) + ", " + Integer.parseInt(posX) + 
+				", " + Integer.parseint(posY) + ", " + Integer.parseInt(tiempoEspera) + ", " + Integer.parseInt(tiempoCiclo);
+			statement.executeUpdate(sentence);
+			statement.close();
+		}
+		catch (SQLException e) {
+			System.out.println("Error SQL al insertar la atraccion " + ID);
+		}
+	}
+
+	public void guardarAtracciones(String infoAtracciones) {
+		String[] lineaAtraccion = infoAtracciones.split("\n");
+
+		for (String linea: lineaAtraccion) {
+			// linea: ID; posX; posY; tiempoEspera; tiempoCiclo
+			boolean existeAtraccion = false;
+			String[] datosAtraccion = linea.split(";");
+			// Comprobamos si esta, si no esta se inserta, si esta se actualiza
+			
+			existeAtraccion = consultarAtraccion(datosAtraccion[0]);
+			if (existeAtraccion) {
+				// Se actualiza la atraccion
+				actualizarAtraccion(datosAtraccion[0], datosAtraccion[1], datosAtraccion[2], datosAtraccion[3], datosAtraccion[4]);
+			}
+			else {
+				// Se inserta la atraccion
+				insertarAtraccion(datosAtraccion[0], datosAtraccion[1], datosAtraccion[2], datosAtraccion[3], datosAtraccion[4]);
+			}
+		}
+	}
+
 	//hilo que hace request al WTS para saber el estado de las atracciones
 	Runnable sckRequest = new Runnable() {
 		public void run() {
@@ -76,13 +150,11 @@ public class FWQ_Engine {
 			//DEBUG
 			System.out.println(mensaje);
 			//DEBUG
-			
+
+			// Info de atracciones se guarda en base de datos
+			guardarAtracciones(mensaje);
 		}
 	};
-
-	public static String getAtracciones() {
-		return atracciones;
-	}
 
 	/**
 	 * @param args

@@ -394,6 +394,27 @@ public class FWQ_HiloEngineKafka extends Thread {
 			System.out.println("Error al manipular la tabla mapa SQL");
 		}
 	}
+
+	public String obtenerAtracciones() {
+		String cadena = "";
+		
+		try {
+			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            Statement statement = connection.createStatement();
+            String sentence = "SELECT * FROM fwq_atracciones";
+			ResultSet result = statement.executeQuery(sentence);
+			while (result.next()) {
+				cadena = cadena + result.getInt("ID") + "; " + result.getInt("posX") + ";" + 
+					result.getInt("posY") + ";" + result.getInt("tiempoEspera") + ";" + result.getInt("tiempoCiclo") + "\n";
+			}
+			statement.close();
+		}
+		catch (SQLException e) {
+			System.out.println("Error SQL al obtener las atracciones");
+		}
+
+		return cadena;
+	}
     
     public void procesarKafka(String topic, String key, String value) {
         // Topic muestra el ALias/ID del Visitor
@@ -433,8 +454,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			enviarKafka(vectorResultados[1], key, tiempoSeg.toString());
 		}
 		else if (key.equals("Atracciones")) {
-			String atracciones = FWQ_Engine.getAtracciones();
-			System.out.println(atracciones);
+			String atracciones = obtenerAtracciones();
 			enviarKafka(vectorResultados[1], key, atracciones);
 		}
     }

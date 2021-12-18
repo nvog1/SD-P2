@@ -273,14 +273,13 @@ public class FWQ_Visitor {
 
 	public String proximoMov() {
 		String result = "";
-		Random rd = new Random();
+		/*Random rd = new Random();
 
 		Integer num = rd.nextInt(8) + 1;
 		// Norte = 1; Noreste = 2; Este = 3; Sureste = 4; 
 		// Sur = 5; Suroeste = 6; Oeste = 7; Noroeste = 8
-		result = num.toString();
+		result = num.toString();*/
 
-		/*String result = "";
 		String topic = "Visitor", key = "Atracciones", value = "Cadena;" + topicConsumer;
 		String kafkaResult = "";
 		String atraccionAux = "";
@@ -314,7 +313,7 @@ public class FWQ_Visitor {
 		}
 
 		// AtraccionObjetivo seleccionada, movimiento hacia ella
-		result = movToAtraccion();*/
+		result = movToAtraccion();
 
 		return result;
 	}
