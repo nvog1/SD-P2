@@ -158,7 +158,7 @@ public class FWQ_HiloEngineKafka extends Thread {
             }
 			result = (op1 && op2);
         }
-
+		
         return result;
     }
 
@@ -401,7 +401,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 		try {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             Statement statement = connection.createStatement();
-            String sentence = "SELECT * FROM fwq_atracciones";
+            String sentence = "SELECT * FROM fwq_bbdd.atracciones";
 			ResultSet result = statement.executeQuery(sentence);
 			while (result.next()) {
 				cadena = cadena + result.getInt("ID") + "; " + result.getInt("posX") + ";" + 

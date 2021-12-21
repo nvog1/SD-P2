@@ -70,7 +70,7 @@ public class FWQ_Engine {
 		try {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             Statement statement = connection.createStatement();
-            String sentence = "SELECT * FROM fwq_atracciones WHERE ID = " + Integer.parseInt(idAtraccion) + "'";
+            String sentence = "SELECT * FROM fwq_bbdd.atracciones WHERE ID = " + IdAtraccion;
 			ResultSet result = statement.executeQuery(sentence);
 			if (result.next()) {
 				resultado = true;
@@ -78,7 +78,7 @@ public class FWQ_Engine {
 			statement.close();
 		}
 		catch (SQLException e) {
-			System.out.println("Error SQL al consultar la atraccion " + idAtraccion);
+			System.out.println("Error SQL al consultar la atraccion " + IdAtraccion + ". " + e.getMessage());
 		}
 
 		return resultado;
@@ -88,9 +88,9 @@ public class FWQ_Engine {
 		try {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             Statement statement = connection.createStatement();
-            String sentence = "UPDATE fwq_atracciones SET posX=" + Integer.parseInt(posX) + ", posY=" + Integer.parseint(posY) + 
-				", tiempoEspera=" + Integer.parseInt(tiempoEspera) + ", tiempoCiclo=" + Integer.parseInt(tiempoCiclo) + 
-				" WHERE ID=" + Integer.parseInt(ID);
+            String sentence = "UPDATE fwq_bbdd.atracciones SET posX=" + posX + ", posY=" + posY + 
+				", tiempoEspera=" + tiempoEspera + ", tiempoCiclo=" + tiempoCiclo + 
+				" WHERE ID=" + ID;
 			statement.executeUpdate(sentence);
 			statement.close();
 		}
@@ -103,8 +103,8 @@ public class FWQ_Engine {
 		try {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             Statement statement = connection.createStatement();
-            String sentence = "INSERT INTO fwq_atracciones VALUES (" + Integer.parseInt(ID) + ", " + Integer.parseInt(posX) + 
-				", " + Integer.parseint(posY) + ", " + Integer.parseInt(tiempoEspera) + ", " + Integer.parseInt(tiempoCiclo);
+            String sentence = "INSERT INTO fwq_ddbb.atracciones VALUES (" + ID + ", " + posX + 
+				", " + posY + ", " + tiempoEspera + ", " + tiempoCiclo;
 			statement.executeUpdate(sentence);
 			statement.close();
 		}
@@ -132,6 +132,7 @@ public class FWQ_Engine {
 				insertarAtraccion(datosAtraccion[0], datosAtraccion[1], datosAtraccion[2], datosAtraccion[3], datosAtraccion[4]);
 			}
 		}
+		System.out.println("Informacion de atracciones procesada");
 	}
 
 	//hilo que hace request al WTS para saber el estado de las atracciones
