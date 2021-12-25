@@ -404,7 +404,7 @@ public class FWQ_HiloEngineKafka extends Thread {
             String sentence = "SELECT * FROM fwq_bbdd.atracciones";
 			ResultSet result = statement.executeQuery(sentence);
 			while (result.next()) {
-				cadena = cadena + result.getInt("ID") + "; " + result.getInt("posX") + ";" + 
+				cadena = cadena + result.getInt("ID") + ";" + result.getInt("posX") + ";" + 
 					result.getInt("posY") + ";" + result.getInt("tiempoEspera") + ";" + result.getInt("tiempoCiclo") + "\n";
 			}
 			statement.close();
@@ -412,6 +412,8 @@ public class FWQ_HiloEngineKafka extends Thread {
 		catch (SQLException e) {
 			System.out.println("Error SQL al obtener las atracciones");
 		}
+
+		System.out.println("Cadena de atracciones obtenida: " + cadena);
 
 		return cadena;
 	}
