@@ -1,19 +1,35 @@
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.clients.consumer.*;
 import java.lang.Exception;
+import java.net.URLConnection;
 import java.io.*;
 import java.util.Properties;
 import java.util.*;
 import java.time.Duration;
 import java.sql.*;
+import java.net.URL;
+import java.net.URLConnection;
+
+import com.google.gson.*;
+import com.google.gson.reflect.*;
 
 public class FWQ_HiloEngineKafka extends Thread {
     private Integer maxVisitantes, tiempoSeg;
 	private String mapaParque = "";
+	// Temperatura del cuadrante 1
+	private Double temp1;
+	// Temperatura del cuadrante 2
+	private Double temp2;
+	// Temperatura del cuadrante 3
+	private Double temp3;
+	// Temperatura del cuadrante 4
+	private Double temp4;
 
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
+	// API de temperatura
+	private static final String API_KEY = "cf42a2773a9baa983a77f3b87fd69a85";
 
     private Properties ProducerProps = new Properties();
     private Properties ConsumerProps = new Properties();
@@ -21,10 +37,16 @@ public class FWQ_HiloEngineKafka extends Thread {
     private KafkaConsumer<String, String> consumer;
 
 
-    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, Integer aforo, Integer segundos) {
+    public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, Integer aforo, Integer segundos, String ciudad1, String ciudad2, String ciudad3, String ciudad4) {
         System.out.println("Configurando propiedades locales");
 		maxVisitantes = aforo;
 		tiempoSeg = segundos;
+
+		// Se obtiene la temperatura de las ciudades
+		temp1 = obtenerTemp(ciudad1);
+		temp2 = obtenerTemp(ciudad2);
+		temp3 = obtenerTemp(ciudad3);
+		temp4 = obtenerTemp(ciudad4);
 
         this.ProducerProps.put("bootstrap.servers", ipBroker + ":" + puertoBroker);
         this.ProducerProps.put("key.serializer" , "org.apache.kafka.common.serialization.StringSerializer");
@@ -45,6 +67,40 @@ public class FWQ_HiloEngineKafka extends Thread {
         // Suscribir el consumer a un topic
 		consumer.subscribe(Collections.singletonList("Visitor"));
     }
+
+	public Double obtenerTemp(String ciudad) {
+		String urlString = "http://api.openweathermap.org/data/2.5/weather?q=" + ciudad + "&appid=" + API_KEY;
+		Double tempResult = 0.0;
+
+		try {
+			StringBuilder result = new StringBuilder();
+			URL url = new URL(urlString);
+			URLConnection conn = url.openConnection();
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line;
+			while ((line = rd.readLine()) != null) {
+				result.append(line);
+			}
+
+			rd.close();
+			Map<String, Object> respMap = jsonToMap(result.toString());
+			Map<String, Object> MainMap = jsonToMap(respMap.get("main").toString());
+
+			tempResult = (Double)MainMap.get("temp") - 273.15;
+			System.out.println("Temperatura de " + ciudad + ": " + tempResult);
+		}
+		catch (IOException e) {
+			System.out.println("Error durante la lectura del API de temperaturas");
+		}
+
+		return tempResult;
+	}
+
+	// Conversion de JSON a MAP
+	public static Map<String,Object> jsonToMap(String str){
+		Map<String,Object> map = new Gson().fromJson(str,new TypeToken<HashMap<String,Object>> () {}.getType());
+		return map;
+	}
     
     public boolean ConsultarUsuarioSQL(String Alias) {
         boolean resultado = false;
@@ -296,15 +352,15 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		cadena = cadena + "MAPA DEL PARQUE\n";
 		// cadena de varias lineas: ID; posX; posY; tiempoEspera; tiempoCiclo
-		/*atracciones = FWQ_Engine.getAtracciones();
+		atracciones = obtenerAtracciones();
 		String[] lineaAtracciones = atracciones.split("\n");
-		Boolean boolAtraccion = false;*/
+		Boolean boolAtraccion = false;
 		// Creacion del mapa
 		for(Integer i = 0; i < 20; i++) {
 			// Para cada Y del eje
 			for (Integer j = 0; j < 20; j++){
 				// Para cada X del eje
-				/*for (int k = 0; k < lineaAtracciones.length && !boolAtraccion; k++) {
+				for (int k = 0; k < lineaAtracciones.length && !boolAtraccion; k++) {
 					// Comprueba si en la posicion xy hay una atraccion
 					String[] datosAtraccion = lineaAtracciones[k].split(";");
 					if (j.equals(Integer.parseInt(datosAtraccion[1])) && i.equals(Integer.parseInt(datosAtraccion[2]))) {
@@ -312,8 +368,8 @@ public class FWQ_HiloEngineKafka extends Thread {
 						// Se añade el tiempo de espera al mapa
 						cadena = cadena + datosAtraccion[3];
 					}
-				}*/
-				if (j.equals(5) && i.equals(2)) {
+				}
+				/*if (j.equals(5) && i.equals(2)) {
 					cadena = cadena + rd.nextInt(79)+1;
 				}
 				else if (j.equals(10) && i.equals(3)) {
@@ -322,8 +378,26 @@ public class FWQ_HiloEngineKafka extends Thread {
 				else if (j.equals(7) && i.equals(2)) {
 					cadena = cadena + rd.nextInt(79)+1;
 				}
-				else if (matriz[i][j] == null) {
-					cadena = cadena + " . ";
+				else*/ if (matriz[i][j] == null) {
+					if ((i <= 9 && j <= 9) && (temp1 < 20 || temp1 > 30)) {
+						// Cuadrante 1 tiene temperatura extrema
+						cadena = cadena + " x ";
+					}
+					else if ((i <= 9 && j > 9) && (temp2 < 20 || temp2 > 30)) {
+						// Cuadrante 2 tiene temperatura extrema
+						cadena = cadena + " x ";
+					}
+					else if ((i > 9 && j <= 9) && (temp3 < 20 || temp3 > 30)) {
+						// Cuadrante 3 tiene temperatura extrema
+						cadena = cadena + " x ";
+					}
+					else if ((i > 9 && j > 9) && (temp4 < 20 || temp4 > 30)) {
+						// Cuadrante 4 tiene temperatura extrema
+						cadena = cadena + " x ";
+					}
+					else {
+						cadena = cadena + " . ";
+					}
 				}
 				else {
 					// Implementado para los visitantes
@@ -417,6 +491,46 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		return cadena;
 	}
+
+	public String procesarTemp() {
+		// Formato --> temp1;temp2;temp3;temp4 (tempX=exntremo/no)
+		String resultado = "";
+
+		if (temp1 < 20 || temp1 > 30) {
+			// Temperatura extrema
+			resultado = resultado + "extremo";
+		}
+		else {
+			// Temperatura asequible
+			resultado = resultado + "no";
+		}
+		if (temp2 < 20 || temp2 > 30) {
+			// Temperatura extrema
+			resultado = resultado + "extremo";
+		}
+		else {
+			// Temperatura asequible
+			resultado = resultado + "no";
+		}
+		if (temp3 < 20 || temp3 > 30) {
+			// Temperatura extrema
+			resultado = resultado + "extremo";
+		}
+		else {
+			// Temperatura asequible
+			resultado = resultado + "no";
+		}
+		if (temp4 < 20 || temp4 > 30) {
+			// Temperatura extrema
+			resultado = resultado + "extremo";
+		}
+		else {
+			// Temperatura asequible
+			resultado = resultado + "no";
+		}
+
+		return resultado;
+	}
     
     public void procesarKafka(String topic, String key, String value) {
         // Topic muestra el ALias/ID del Visitor
@@ -424,7 +538,7 @@ public class FWQ_HiloEngineKafka extends Thread {
         // Value muestra la opcion a la accion que se quiere hacer; el Alias del visitor; el topic de vuelta
         String[] vectorResultados = value.split(";");
 
-        System.out.println("Topic: " + topic + "; Key: " + key + "; Value: " + vectorResultados[0]);
+        System.out.println("Topic: " + topic + "; Key: " + key + "; Value: " + value);
         if (key.equals("entrar")) {
             // Se quiere entrar 
 			Boolean boolResult = entrar(topic, value);
@@ -458,6 +572,12 @@ public class FWQ_HiloEngineKafka extends Thread {
 		else if (key.equals("Atracciones")) {
 			String atracciones = obtenerAtracciones();
 			enviarKafka(vectorResultados[1], key, atracciones);
+		}
+		else if (key.equals("Temperaturas")) {
+			// Se le envia al visitor las temperaturas
+			// Topic: Visitor; Key: "Temperaturas"; Value: Cadena;AliasVisitor
+			String temperaturas = procesarTemp();
+			enviarKafka(vectorResultados[1], key, temperaturas);
 		}
     }
 

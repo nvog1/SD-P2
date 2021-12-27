@@ -165,7 +165,7 @@ public class FWQ_Engine {
 		try
 		{
 			if (args.length < 6) {
-				System.out.println("Indica: ip_broker puerto_broker ip_wts puerto_wts maxVisitantes segundos");
+				System.out.println("Indica: ip_broker puerto_broker ip_wts puerto_wts maxVisitantes segundos ciudad1 ciudad2 ciudad3 ciudad4");
 				System.exit(1);
 			}
 			String ip_broker = "";
@@ -174,6 +174,7 @@ public class FWQ_Engine {
 			//String puerto_wts = "";
 			int maxVisitantes = -1;
 			int segundos = -1; //segundos de espera entre peticiones al wts
+			String ciudad1, ciudad2, ciudad3, ciudad4; 
 
 			ip_broker = args[0];
 			puerto_broker = args[1];
@@ -186,10 +187,14 @@ public class FWQ_Engine {
 			catch(Exception e){
 				System.out.println("Error al convertir par�metros");
 			}
+			ciudad1 = args[6];
+			ciudad2 = args[7];
+			ciudad3 = args[8];
+			ciudad4 = args[9];
 			
 
 			// Hilo de kafka
-			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes, segundos);
+			Thread tKafka = new FWQ_HiloEngineKafka(ip_broker, puerto_broker, maxVisitantes, segundos, ciudad1, ciudad2, ciudad3, ciudad4);
 			tKafka.start();
 
 			//conexion a wts

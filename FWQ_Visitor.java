@@ -273,6 +273,8 @@ public class FWQ_Visitor {
 
 	public String proximoMov() {
 		String result = "";
+		String topic, key, value;
+		String kafkaResult = "";
 		/*Random rd = new Random();
 
 		Integer num = rd.nextInt(8) + 1;
@@ -280,8 +282,18 @@ public class FWQ_Visitor {
 		// Sur = 5; Suroeste = 6; Oeste = 7; Noroeste = 8
 		result = num.toString();*/
 
-		String topic = "Visitor", key = "Atracciones", value = "Cadena;" + topicConsumer;
-		String kafkaResult = "";
+		// Para recibir las temperaturas
+		topic = "Visitor";
+		key = "Temperaturas";
+		value = "Cadena;" + topicConsumer;
+		enviarKafka(topic, key, value);
+		kafkaResult = recibirKafka();
+		// infoTemp = temp1;temp2;temp3;temp4 (tempX=exntremo/no)
+		String[] infoTemp = kafkaResult.split(";");
+
+		topic = "Visitor";
+		key = "Atracciones";
+		value = "Cadena;" + topicConsumer;kafkaResult = "";
 		String atraccionAux = "";
 
 		enviarKafka(topic, key, value);
@@ -290,11 +302,12 @@ public class FWQ_Visitor {
 		kafkaResult = recibirKafka();
 		// Se comprueba si la atraccionActual sigue cumpliendo que tiempoEspera < 60
 		String[] lineaAtraccion = kafkaResult.split("\n");
+
 		if (!atraccionObjetivo.equals("")) {
 			// Ya tiene una atraccionObjetivo
 			String[] datosAtraccion = atraccionObjetivo.split(";");
 			for (String linea: lineaAtraccion) {
-				String[] vectorResultados = kafkaResult.split(";");
+				String[] vectorResultados = linea.split(";");
 				if (vectorResultados[0].equals(datosAtraccion[0])) {
 					// Se ha encontrado la linea de la atraccion, se comprueba si sigue tiempoEspera < 60
 					if (Integer.parseInt(vectorResultados[3]) < 60) {
