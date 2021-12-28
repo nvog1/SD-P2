@@ -378,7 +378,16 @@ public class FWQ_HiloEngineKafka extends Thread {
 				else if (j.equals(7) && i.equals(2)) {
 					cadena = cadena + rd.nextInt(79)+1;
 				}
-				else*/ if (matriz[i][j] == null) {
+				else*/
+				if (matriz[i][j] != null) {
+					// Implementado para los visitantes
+					Character aux = matriz[i][j].charAt(0);
+					//if (aux.isLetter(matriz[i][j].charAt(0))) {
+					if (aux >= 97 && aux <= 122) {
+						// En la matriz hay un caracter (un visitante)
+						cadena = cadena + " " + matriz[i][j] + " ";
+					}
+				} else if (matriz[i][j] == null) {
 					if ((i <= 9 && j <= 9) && (temp1 < 20 || temp1 > 30)) {
 						// Cuadrante 1 tiene temperatura extrema
 						cadena = cadena + " x ";
@@ -397,15 +406,6 @@ public class FWQ_HiloEngineKafka extends Thread {
 					}
 					else {
 						cadena = cadena + " . ";
-					}
-				}
-				else {
-					// Implementado para los visitantes
-					Character aux = matriz[i][j].charAt(0);
-					//if (aux.isLetter(matriz[i][j].charAt(0))) {
-					if (aux >= 97 && aux <= 122) {
-						// En la matriz hay un caracter (un visitante)
-						cadena = cadena + " " + matriz[i][j] + " ";
 					}
 				}
 			}
@@ -531,6 +531,21 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		return resultado;
 	}
+
+	public void guardarCadenaMapaSQL(String mapa) {
+		try {
+			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+            
+            Statement statement = connection.createStatement();
+            String sentence = "UPDATE FWQ_BBDD.cadenaMapa SET cadena = " + mapa + " WHERE ID = 1";
+
+			statement.executeUpdate(sentence);
+			statement.close();
+		}
+		catch (Exception e) {
+			System.out.println("Error al actualizar la cadena del mapa, " + e.toString());
+		}
+	}
     
     public void procesarKafka(String topic, String key, String value) {
         // Topic muestra el ALias/ID del Visitor
@@ -561,6 +576,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			String resultado = "";
 			comprobarMapa(vectorResultados[0], vectorResultados[1], vectorResultados[2]);
 			mapaParque = CadenaMapa(actualizarMapa(vectorResultados[0], vectorResultados[3]));
+			guardarCadenaMapaSQL(mapaParque);
 			// Se devuelve el mapa al visitor
 			enviarKafka(vectorResultados[4], key, mapaParque);
 		}
