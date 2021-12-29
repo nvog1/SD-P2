@@ -496,7 +496,6 @@ public class FWQ_Visitor {
 
 		try {
 			
-			//Socket skRegistro = new Socket(p_registryHost, Integer.parseInt(p_registryPort));
 			//preparar Secure Socket
 			System.setProperty("javax.net.ssl.trustStore", "sd.store");
 			Socket skRegistro = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(p_registryHost, Integer.parseInt(p_registryPort));

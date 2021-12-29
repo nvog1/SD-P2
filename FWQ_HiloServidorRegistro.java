@@ -48,6 +48,32 @@ public class FWQ_HiloServidorRegistro extends Thread {
 		return;
 	}
 
+    //pasar el hash de bytes a hexadecimal
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    //función que hashea la password 20 veces
+    public String hash(String password){
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        //hasheamos 20 veces
+        byte[] hash = password.getBytes(StandardCharsets.UTF_8);
+        for(int i = 0; i<20; i++){
+            hash = digest.digest(hash);
+        }
+        String hexHash = bytesToHex(hash);
+
+        return hexHash;
+    }
+
     // Conexion con la Base de datos
 
     // Insertar usuario
@@ -55,6 +81,8 @@ public class FWQ_HiloServidorRegistro extends Thread {
         try {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
+            password = hash(password);
+
             Statement statement = connection.createStatement();
             String sentence = "INSERT INTO Usuarios VALUES ('" + Alias 
                 + "', '" + nombre + "', '" + password + "')";
@@ -73,6 +101,8 @@ public class FWQ_HiloServidorRegistro extends Thread {
         try {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
+            password = hash(password);
+
             Statement statement = connection.createStatement();
             String sentence = "UPDATE Usuarios SET Nombre = '" + nombre + 
                 "', Contrasenya = '" + password + "' WHERE Alias = '" + Alias + "'";
@@ -94,6 +124,8 @@ public class FWQ_HiloServidorRegistro extends Thread {
         try {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
+            password = hash(password);
+
             Statement statement = connection.createStatement();
             String sentence = "SELECT Contrasenya FROM Usuarios WHERE Alias = '" + Alias + "'";
             ResultSet result = statement.executeQuery(sentence);

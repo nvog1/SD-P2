@@ -26,7 +26,6 @@ public class FWQ_Registry {
             //sslsocket
             System.setProperty("javax.net.ssl.keyStore", "sd.store");
             System.setProperty("javax.net.ssl.keyStorePassword", "password");
-            //ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto));
             ServerSocket skServidor = ((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(Integer.parseInt(puerto));
             System.out.println("Escucho el puerto: " + puerto);
 
