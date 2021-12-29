@@ -137,16 +137,42 @@ public class FWQ_Visitor {
 		return p_resultado;
 	}
 
-	public void seleccionarAtraccion(String cadenaAtracciones) {
+	public Integer obtenerCuadrante(String posX, String posY) {
+		Integer cuadranteResult;
+
+		if (Integer.parseInt(posX) <= 9 && Integer.parseint(posY) <= 9) {
+			// 1 cuadrante
+			cuadranteResult = 0;
+		}
+		else if (Integer.parseInt(posX) > 9 && Integer.parseint(posY) <= 9) {
+			// 2 cuadrante
+			cuadranteResult = 1;
+		}
+		else if (Integer.parseInt(posX) <= 9 && Integer.parseint(posY) > 9) {
+			// 3 cuadrante
+			cuadranteResult = 2;
+		}
+		else if (Integer.parseInt(posX) > 9 && Integer.parseint(posY) > 9) {
+			// 4 cuadrante
+			cuadranteResult = 3;
+		}
+
+		return cuadranteResult;
+	}
+
+	public void seleccionarAtraccion(String cadenaAtracciones, String[] infoTemp) {
 		String[] lineaAtraccion = cadenaAtracciones.split("\n");
 		Integer numRandom = -1;
 		Random rd = new Random();
 		boolean continuar = true;
 
 		do {
+			Integer cuadrante;
 			numRandom = rd.nextInt(lineaAtraccion.length);
 			String[] datosAtraccion = lineaAtraccion[numRandom].split(";");
-			if (Integer.parseInt(datosAtraccion[3]) < 60) {
+			cuadrante = obtenerCuadrante(datosAtraccion[1], datosAtraccion[2]);
+			// ID;posX;posY;tiempoEspera;tiempoCiclo
+			if (Integer.parseInt(datosAtraccion[3]) < 60 && !infoTemp[cuadrante].equals("extremo")) {
 				// Se cumple la condicion de atraccionObjetivo
 				atraccionObjetivo = lineaAtraccion[numRandom];
 				continuar = false;
@@ -288,7 +314,7 @@ public class FWQ_Visitor {
 		value = "Cadena;" + topicConsumer;
 		enviarKafka(topic, key, value);
 		kafkaResult = recibirKafka();
-		// infoTemp = temp1;temp2;temp3;temp4 (tempX=exntremo/no)
+		// infoTemp = temp1;temp2;temp3;temp4 (tempX=extremo/no)
 		String[] infoTemp = kafkaResult.split(";");
 
 		topic = "Visitor";
@@ -315,14 +341,14 @@ public class FWQ_Visitor {
 					}
 					else {
 						// Se selecciona una nueva atraccionObjetivo
-						seleccionarAtraccion(kafkaResult);
+						seleccionarAtraccion(kafkaResult, infoTemp);
 					}
 				}
 			}
 		}
 		else {
 			// Se selecciona una nueva atraccionObjetivo
-			seleccionarAtraccion(kafkaResult);
+			seleccionarAtraccion(kafkaResult, infoTemp);
 		}
 
 		// AtraccionObjetivo seleccionada, movimiento hacia ella
