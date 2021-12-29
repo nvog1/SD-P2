@@ -3,6 +3,8 @@ import java.net.*;
 import java.util.Properties;
 import java.util.*;
 import java.time.*;
+import java.net.ServerSocket;
+import javax.net.ssl.*;
  
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.clients.consumer.*;
@@ -545,7 +547,11 @@ public class FWQ_Visitor {
 		BufferedReader br = new BufferedReader(isr);
 
 		try {
+			
+			//preparar Secure Socket
+			System.setProperty("javax.net.ssl.trustStore", "sd.store");
 			Socket skRegistro = new Socket(p_registryHost, Integer.parseInt(p_registryPort));
+			//Socket skRegistro = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(p_registryHost, Integer.parseInt(p_registryPort));
 
 			while (salir == 0) {
 				operacion = 0;
@@ -673,6 +679,7 @@ public class FWQ_Visitor {
 		QueueHandlerHost = args[2];
 		QueueHandlerPort = args[3];
 		topicConsumer = args[4];
+
 
 		//preparar(QueueHandlerHost, QueueHandlerPort);
 		// Kafka Producer
