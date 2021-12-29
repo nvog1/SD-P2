@@ -67,8 +67,6 @@ public class FWQ_HiloServidorRegistro extends Thread {
     public String hash(String password){
         byte[] hash = password.getBytes(StandardCharsets.UTF_8);
 
-        System.out.println("Empieza el hash");
-
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             //hasheamos 20 veces
@@ -79,8 +77,6 @@ public class FWQ_HiloServidorRegistro extends Thread {
         catch (Exception e) {
             System.out.println("Error al hacer el hash");
         }
-
-        System.out.println("Termina el hash");
         
         String hexHash = bytesToHex(hash);
 
