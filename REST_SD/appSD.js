@@ -61,6 +61,37 @@ appSD.get("/usuarios/:id",(request,response) => {
     });
 });
 
+// Listar las atracciones
+appSD.get("/atracciones",(request, response) => {
+    console.log('Listado de las atracciones');
+
+    const sql = 'SELECT * FROM fwq_bbdd.atracciones';
+    connection.query(sql, (error,resultado)=>{
+        if (error) throw error;
+        if (resultado.length > 0) {
+            response.json(resultado);
+        } else {
+            response.send('No hay atracciones')
+        }
+    });
+});
+
+// Mostrar un usuario especifico
+appSD.get("/atracciones/:id",(request,response) => {
+    console.log('atraccion especifica');
+
+    const {id} = request.params;
+    const sql = 'SELECT * FROM fwq_bbdd.atracciones WHERE ID = \'' + id + '\'';
+    connection.query(sql,(error,resultado)=>{
+        if (error) throw error;
+        if (resultado.length > 0) {
+            response.json(resultado);
+        } else {
+            response.send('No existe la atraccion especificada');
+        }
+    });
+});
+
 // Mostrar el mapa
 appSD.get("/mapa",(request, response) => {
     console.log('Obtener el mapa del parque');
