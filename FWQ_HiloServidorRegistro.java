@@ -228,7 +228,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
             skCliente.close();
         }
         catch (SocketException e) {
-            System.out.println("Error: El visitante se ha desconectado");
+            System.out.println("Error: El visitante se ha desconectado. " + e.getMessage());
         }
         catch (IOException e) {
             System.out.println("Error al manipular los sockets");

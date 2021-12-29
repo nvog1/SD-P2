@@ -9,6 +9,11 @@ import javax.net.ssl.*;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.clients.consumer.*;
 
+import java.security.*;
+import java.util.logging.*;
+import javax.crypto.*;
+import sun.misc.*;
+
 public class FWQ_Visitor {
 	private static String topicConsumer;
 	private String posicionActual = "";
@@ -19,6 +24,10 @@ public class FWQ_Visitor {
 	private static Properties ConsumerProps = new Properties();
 	private static KafkaProducer producer;
 	private static KafkaConsumer consumer;
+	//contraseña cifrado mensajes
+	private static final String key = "SD";
+	private static final String ALG = "AES";
+	private byte[] keyValue;
 
     public String leeSocket (Socket p_sk, String p_Datos)
 	{
@@ -426,7 +435,11 @@ public class FWQ_Visitor {
 	}
 
 	public void enviarKafka(String topic, String key, String value) {
-		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+		//encriptamos value	
+		String encValue = encrypt(value);
+		System.out.println(encValue);
+
+		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, encValue);
 		System.out.println("\n----------------------------------\n" + 
 			"Se va a enviar el mensaje de Kafka");
 		try {
@@ -456,8 +469,9 @@ public class FWQ_Visitor {
                     topic = record.topic();
                     key = record.key();
                     value = record.value();
+					String decValue = decrypt(value);
 					
-					return value;
+					return decValue;
                 }
             }
         }
@@ -550,8 +564,8 @@ public class FWQ_Visitor {
 			
 			//preparar Secure Socket
 			System.setProperty("javax.net.ssl.trustStore", "sd.store");
-			Socket skRegistro = new Socket(p_registryHost, Integer.parseInt(p_registryPort));
-			//Socket skRegistro = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(p_registryHost, Integer.parseInt(p_registryPort));
+			//Socket skRegistro = new Socket(p_registryHost, Integer.parseInt(p_registryPort));
+			Socket skRegistro = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(p_registryHost, Integer.parseInt(p_registryPort));
 
 			while (salir == 0) {
 				operacion = 0;
@@ -658,6 +672,30 @@ public class FWQ_Visitor {
 		}
 	}
 
+	public String encrypt(String data) throws Exception {
+		Key key = generateKey();
+		Cipher c = Cipher.getInstance(ALG);
+		c.init(Cipher.ENCRYPT_MODE, key);
+		byte[] encVal = c.doFinal(data.getBytes());
+		String encryptedValue = new BASE64Encoder().encode(encVal);
+		return encryptedValue;
+	}
+
+	public String decrypt(String encryptedData) throws Exception {
+		Key key = generateKey();
+		Cipher c = Cipher.getInstance(ALG);
+		c.init(Cipher.DECRYPT_MODE, key);
+		byte[] decodedValue = new BASE64Encoder().decodeBuffer(encryptedData);
+		byte[] decValue = c.doFinal(decodedValue);
+		String decryptedValue = new String(decValue);
+		return decryptedValue;
+	}
+
+	private Key generateKey() throws Exception {
+		Key key = new SecretKeySpec(keyValue, ALG);
+		return key;
+	}
+
     public static void main(String[] args) {
 		// localhost 9999 localhost 
         FWQ_Visitor visitante = new FWQ_Visitor();
@@ -679,6 +717,8 @@ public class FWQ_Visitor {
 		QueueHandlerHost = args[2];
 		QueueHandlerPort = args[3];
 		topicConsumer = args[4];
+
+		keyValue = key.getBytes();
 
 
 		//preparar(QueueHandlerHost, QueueHandlerPort);

@@ -13,6 +13,11 @@ import java.net.URLConnection;
 import com.google.gson.*;
 import com.google.gson.reflect.*;
 
+import java.security.*;
+import java.util.logging.*;
+import javax.crypto.*;
+import sun.misc.*;
+
 public class FWQ_HiloEngineKafka extends Thread {
     private Integer maxVisitantes, tiempoSeg;
 	private String mapaParque = "";
@@ -35,6 +40,11 @@ public class FWQ_HiloEngineKafka extends Thread {
     private Properties ConsumerProps = new Properties();
     private KafkaProducer<String, String> producer;
     private KafkaConsumer<String, String> consumer;
+
+	private static final String ALG = "AES";
+	private byte[] keyValue;
+	//contraseña cifrado mensajes
+	private static final String key = "SD";
 
 
     public FWQ_HiloEngineKafka(String ipBroker, String puertoBroker, Integer aforo, Integer segundos, String ciudad1, String ciudad2, String ciudad3, String ciudad4) {
@@ -549,11 +559,15 @@ public class FWQ_HiloEngineKafka extends Thread {
 		}
 	}
     
-    public void procesarKafka(String topic, String key, String value) {
+    public void procesarKafka(String topic, String key, String encValue) {
         // Topic muestra el ALias/ID del Visitor
         // Key muestra la accion que se quiere hacer
         // Value muestra la opcion a la accion que se quiere hacer; el Alias del visitor; el topic de vuelta
         String[] vectorResultados = value.split(";");
+
+		System.out.println(encValue);
+		//decrypt value
+		String value = decrypt(encValue);
 
         System.out.println("Topic: " + topic + "; Key: " + key + "; Value: " + value);
         if (key.equals("entrar")) {
@@ -600,7 +614,11 @@ public class FWQ_HiloEngineKafka extends Thread {
     }
 
 	public void enviarKafka(String topic, String key, String value) {
-		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+		//encriptamos value	
+		String encValue = encrypt(value);
+		System.out.println(encValue);
+
+		ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, encValue);
 		System.out.println("\n----------------------------------\n" + 
 			"Se va a enviar el mensaje de Kafka");
 		try {
@@ -612,10 +630,35 @@ public class FWQ_HiloEngineKafka extends Thread {
 		}
 	}
 
+	public String encrypt(String data) throws Exception {
+		Key key = generateKey();
+		Cipher c = Cipher.getInstance(ALG);
+		c.init(Cipher.ENCRYPT_MODE, key);
+		byte[] encVal = c.doFinal(data.getBytes());
+		String encryptedValue = new BASE64Encoder().encode(encVal);
+		return encryptedValue;
+	}
+
+	public String decrypt(String encryptedData) throws Exception {
+		Key key = generateKey();
+		Cipher c = Cipher.getInstance(ALG);
+		c.init(Cipher.DECRYPT_MODE, key);
+		byte[] decodedValue = new BASE64Encoder().decodeBuffer(encryptedData);
+		byte[] decValue = c.doFinal(decodedValue);
+		String decryptedValue = new String(decValue);
+		return decryptedValue;
+	}
+
+	private Key generateKey() throws Exception {
+		Key key = new SecretKeySpec(keyValue, ALG);
+		return key;
+	}
+
     public void run() {
         boolean continuar = true;
         Duration timeout = Duration.ofMillis(100);
         String topic = "", key = "", value = "";
+		keyValue = key.getBytes();
 
         // Bucle de escucha kafka
        while (continuar) {
