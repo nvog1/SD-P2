@@ -138,21 +138,21 @@ public class FWQ_Visitor {
 	}
 
 	public Integer obtenerCuadrante(String posX, String posY) {
-		Integer cuadranteResult;
+		Integer cuadranteResult = -1;
 
-		if (Integer.parseInt(posX) <= 9 && Integer.parseint(posY) <= 9) {
+		if (Integer.parseInt(posX) <= 9 && Integer.parseInt(posY) <= 9) {
 			// 1 cuadrante
 			cuadranteResult = 0;
 		}
-		else if (Integer.parseInt(posX) > 9 && Integer.parseint(posY) <= 9) {
+		else if (Integer.parseInt(posX) > 9 && Integer.parseInt(posY) <= 9) {
 			// 2 cuadrante
 			cuadranteResult = 1;
 		}
-		else if (Integer.parseInt(posX) <= 9 && Integer.parseint(posY) > 9) {
+		else if (Integer.parseInt(posX) <= 9 && Integer.parseInt(posY) > 9) {
 			// 3 cuadrante
 			cuadranteResult = 2;
 		}
-		else if (Integer.parseInt(posX) > 9 && Integer.parseint(posY) > 9) {
+		else if (Integer.parseInt(posX) > 9 && Integer.parseInt(posY) > 9) {
 			// 4 cuadrante
 			cuadranteResult = 3;
 		}

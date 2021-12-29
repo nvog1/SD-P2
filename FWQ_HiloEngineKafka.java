@@ -360,13 +360,15 @@ public class FWQ_HiloEngineKafka extends Thread {
 			// Para cada Y del eje
 			for (Integer j = 0; j < 20; j++){
 				// Para cada X del eje
+				Boolean atraccionEncontrada = false;
 				for (int k = 0; k < lineaAtracciones.length && !boolAtraccion; k++) {
 					// Comprueba si en la posicion xy hay una atraccion
 					String[] datosAtraccion = lineaAtracciones[k].split(";");
 					if (j.equals(Integer.parseInt(datosAtraccion[1])) && i.equals(Integer.parseInt(datosAtraccion[2]))) {
 						boolAtraccion = true;
 						// Se añade el tiempo de espera al mapa
-						cadena = cadena + datosAtraccion[3];
+						cadena = cadena + " " + datosAtraccion[3] + " ";
+						atraccionEncontrada = true;
 					}
 				}
 				/*if (j.equals(5) && i.equals(2)) {
@@ -379,33 +381,35 @@ public class FWQ_HiloEngineKafka extends Thread {
 					cadena = cadena + rd.nextInt(79)+1;
 				}
 				else*/
-				if (matriz[i][j] != null) {
-					// Implementado para los visitantes
-					Character aux = matriz[i][j].charAt(0);
-					//if (aux.isLetter(matriz[i][j].charAt(0))) {
-					if (aux >= 97 && aux <= 122) {
-						// En la matriz hay un caracter (un visitante)
-						cadena = cadena + " " + matriz[i][j] + " ";
-					}
-				} else if (matriz[i][j] == null) {
-					if ((i <= 9 && j <= 9) && (temp1 < 20 || temp1 > 30)) {
-						// Cuadrante 1 tiene temperatura extrema
-						cadena = cadena + " x ";
-					}
-					else if ((i <= 9 && j > 9) && (temp2 < 20 || temp2 > 30)) {
-						// Cuadrante 2 tiene temperatura extrema
-						cadena = cadena + " x ";
-					}
-					else if ((i > 9 && j <= 9) && (temp3 < 20 || temp3 > 30)) {
-						// Cuadrante 3 tiene temperatura extrema
-						cadena = cadena + " x ";
-					}
-					else if ((i > 9 && j > 9) && (temp4 < 20 || temp4 > 30)) {
-						// Cuadrante 4 tiene temperatura extrema
-						cadena = cadena + " x ";
-					}
-					else {
-						cadena = cadena + " . ";
+				if (!atraccionEncontrada) {
+					if (matriz[i][j] != null) {
+						// Implementado para los visitantes
+						Character aux = matriz[i][j].charAt(0);
+						//if (aux.isLetter(matriz[i][j].charAt(0))) {
+						if (aux >= 97 && aux <= 122) {
+							// En la matriz hay un caracter (un visitante)
+							cadena = cadena + " " + matriz[i][j] + " ";
+						}
+					} else if (matriz[i][j] == null) {
+						if ((i <= 9 && j <= 9) && (temp1 < 20 || temp1 > 30)) {
+							// Cuadrante 1 tiene temperatura extrema
+							cadena = cadena + " x ";
+						}
+						else if ((i <= 9 && j > 9) && (temp2 < 20 || temp2 > 30)) {
+							// Cuadrante 2 tiene temperatura extrema
+							cadena = cadena + " x ";
+						}
+						else if ((i > 9 && j <= 9) && (temp3 < 20 || temp3 > 30)) {
+							// Cuadrante 3 tiene temperatura extrema
+							cadena = cadena + " x ";
+						}
+						else if ((i > 9 && j > 9) && (temp4 < 20 || temp4 > 30)) {
+							// Cuadrante 4 tiene temperatura extrema
+							cadena = cadena + " x ";
+						}
+						else {
+							cadena = cadena + " . ";
+						}
 					}
 				}
 			}
@@ -498,27 +502,27 @@ public class FWQ_HiloEngineKafka extends Thread {
 
 		if (temp1 < 20 || temp1 > 30) {
 			// Temperatura extrema
-			resultado = resultado + "extremo";
+			resultado = resultado + "extremo;";
 		}
 		else {
 			// Temperatura asequible
-			resultado = resultado + "no";
+			resultado = resultado + "no;";
 		}
 		if (temp2 < 20 || temp2 > 30) {
 			// Temperatura extrema
-			resultado = resultado + "extremo";
+			resultado = resultado + "extremo;";
 		}
 		else {
 			// Temperatura asequible
-			resultado = resultado + "no";
+			resultado = resultado + "no;";
 		}
 		if (temp3 < 20 || temp3 > 30) {
 			// Temperatura extrema
-			resultado = resultado + "extremo";
+			resultado = resultado + "extremo;";
 		}
 		else {
 			// Temperatura asequible
-			resultado = resultado + "no";
+			resultado = resultado + "no;";
 		}
 		if (temp4 < 20 || temp4 > 30) {
 			// Temperatura extrema
@@ -537,7 +541,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             Statement statement = connection.createStatement();
-            String sentence = "UPDATE FWQ_BBDD.cadenaMapa SET cadena = " + mapa + " WHERE ID = 1";
+            String sentence = "UPDATE FWQ_BBDD.cadenaMapa SET cadena = " + mapa + " WHERE ID = '1'";
 
 			statement.executeUpdate(sentence);
 			statement.close();
