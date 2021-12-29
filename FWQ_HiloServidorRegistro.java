@@ -3,6 +3,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.io.*;
 import java.sql.*;
+import java.security.*;
+import java.nio.charset.StandardCharsets;
 
 
 public class FWQ_HiloServidorRegistro extends Thread {
@@ -61,14 +63,25 @@ public class FWQ_HiloServidorRegistro extends Thread {
         return hexString.toString();
     }
 
-    //función que hashea la password 20 veces
+    //funciï¿½n que hashea la password 20 veces
     public String hash(String password){
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        //hasheamos 20 veces
         byte[] hash = password.getBytes(StandardCharsets.UTF_8);
-        for(int i = 0; i<20; i++){
-            hash = digest.digest(hash);
+
+        System.out.println("Empieza el hash");
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            //hasheamos 20 veces
+            for(int i = 0; i<20; i++){
+                hash = digest.digest(hash);
+            }
         }
+        catch (Exception e) {
+            System.out.println("Error al hacer el hash");
+        }
+
+        System.out.println("Termina el hash");
+        
         String hexHash = bytesToHex(hash);
 
         return hexHash;
@@ -97,7 +110,7 @@ public class FWQ_HiloServidorRegistro extends Thread {
             statement.close();
         }
         catch (SQLException e) {
-            System.out.println("Error al insertart un usuario en SQL");
+            System.out.println("Error al insertar un usuario en SQL. " + e.getMessage());
         }
     }
    public void UpdateUsuarioSQL(String Alias, String nombre, String password) {
