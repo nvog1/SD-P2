@@ -165,7 +165,9 @@ public class FWQ_Visitor {
 		Integer numRandom = -1;
 		Random rd = new Random();
 		boolean continuar = true;
+		Integer cont = 0;
 
+		System.out.println("Seleccionando atraccion");
 		do {
 			Integer cuadrante;
 			numRandom = rd.nextInt(lineaAtraccion.length);
@@ -177,8 +179,20 @@ public class FWQ_Visitor {
 				atraccionObjetivo = lineaAtraccion[numRandom];
 				continuar = false;
 			}
-		} while(continuar);
+			cont++;
+		} while(continuar && cont < 50);
 
+		if (cont.equals(50)) {
+			// Considerar que todas las temperaturas son extremas
+			System.out.println("No se ha encontrado una atraccion activa, comprueba las temperaturas");
+			atraccionObjetivo = "-1";
+			try {
+				Thread.sleep(tiempoEspera);
+			}
+			catch (Exception e) {
+				System.out.println("Error al parar la ejecucion al elegir atraccion");
+			}
+		}
 	}
 
 	public Integer contAbajo(int origen, int destino) {
@@ -221,76 +235,87 @@ public class FWQ_Visitor {
 		int movX, movY;
 		String result = "";
 
-		String[] atraccion = atraccionObjetivo.split(";");
-		String[] visitor = posicionActual.split(";");
+		if (atraccionObjetivo.equals("-1")) {
+ 			// No hay ninguna atraccion activa, movimiento aleatorio (result = {1-8})
+			 Random rd = new Random();
 
-		atraccionX = Integer.parseInt(atraccion[1]);
-		atraccionY = Integer.parseInt(atraccion[2]);
-		visitorX = Integer.parseInt(visitor[0]);
-		visitorY = Integer.parseInt(visitor[1]);
-
-		xCircular = /*-1 * (visitorX + (19 - atraccionX) + 1)*/contAbajo(visitorX, atraccionX);
-		yCircular = /*-1 * (visitorY + (19 - atraccionY) + 1)*/contAbajo(visitorY, atraccionY);
-		x = /*abs(atraccionX - visitorX)*/contArriba(visitorX, atraccionX);
-		y = /*abs(atraccionY - atraccionX)*/contArriba(visitorY, atraccionY);
-
-		// Cogemos el menor componente de cada eje, diferenciamos usando negativos
-		if (x <= Math.abs(xCircular)) {
-			movX = x;
+			Integer num = rd.nextInt(8) + 1;
+			// Norte = 1; Noreste = 2; Este = 3; Sureste = 4; 
+			// Sur = 5; Suroeste = 6; Oeste = 7; Noroeste = 8
+			result = num.toString();
 		}
 		else {
-			movX = xCircular;
-		}
-		if (y <= Math.abs(yCircular)) {
-			movY = y;
-		}
-		else {
-			movY = yCircular;
-		}
+			String[] atraccion = atraccionObjetivo.split(";");
+			String[] visitor = posicionActual.split(";");
 
-		if (movX < 0) {
-			// Se ira hacia el Oeste
-			if (movY < 0) {
-				// Noroeste
-				result = "8";
-			}
-			else if (movY > 0) {
-				// Suroeste
-				result = "6";
-			}
-			else {
-				// Oeste
-				result = "7";
-			}
-		}
-		else if (movX > 0) {
-			// Se ira hacia el Este
-			if (movY < 0) {
-				// Noreste
-				result = "2";
-			}
-			else if (movY > 0) {
-				// Sureste
-				result = "4";
+			atraccionX = Integer.parseInt(atraccion[1]);
+			atraccionY = Integer.parseInt(atraccion[2]);
+			visitorX = Integer.parseInt(visitor[0]);
+			visitorY = Integer.parseInt(visitor[1]);
+
+			xCircular = /*-1 * (visitorX + (19 - atraccionX) + 1)*/contAbajo(visitorX, atraccionX);
+			yCircular = /*-1 * (visitorY + (19 - atraccionY) + 1)*/contAbajo(visitorY, atraccionY);
+			x = /*abs(atraccionX - visitorX)*/contArriba(visitorX, atraccionX);
+			y = /*abs(atraccionY - atraccionX)*/contArriba(visitorY, atraccionY);
+
+			// Cogemos el menor componente de cada eje, diferenciamos usando negativos
+			if (x <= Math.abs(xCircular)) {
+				movX = x;
 			}
 			else {
-				// Este
-				result = "3";
+				movX = xCircular;
 			}
-		}
-		else {
-			// movX = 0, va hacia Norte o Sur
-			if (movY < 0) {
-				// Norte
-				result = "1";
-			}
-			else if (movY > 0) {
-				// Sur
-				result = "5";
+			if (y <= Math.abs(yCircular)) {
+				movY = y;
 			}
 			else {
-				// movX = 0; movY = 0; destino
-				result = "0";
+				movY = yCircular;
+			}
+
+			if (movX < 0) {
+				// Se ira hacia el Oeste
+				if (movY < 0) {
+					// Noroeste
+					result = "8";
+				}
+				else if (movY > 0) {
+					// Suroeste
+					result = "6";
+				}
+				else {
+					// Oeste
+					result = "7";
+				}
+			}
+			else if (movX > 0) {
+				// Se ira hacia el Este
+				if (movY < 0) {
+					// Noreste
+					result = "2";
+				}
+				else if (movY > 0) {
+					// Sureste
+					result = "4";
+				}
+				else {
+					// Este
+					result = "3";
+				}
+			}
+			else {
+				// movX = 0, va hacia Norte o Sur
+				if (movY < 0) {
+					// Norte
+					result = "1";
+				}
+				else if (movY > 0) {
+					// Sur
+					result = "5";
+				}
+				else {
+					// movX = 0; movY = 0; destino
+					result = "0";
+				}
 			}
 		}
 
@@ -319,7 +344,8 @@ public class FWQ_Visitor {
 
 		topic = "Visitor";
 		key = "Atracciones";
-		value = "Cadena;" + topicConsumer;kafkaResult = "";
+		value = "Cadena;" + topicConsumer;
+		kafkaResult = "";
 		String atraccionAux = "";
 
 		enviarKafka(topic, key, value);

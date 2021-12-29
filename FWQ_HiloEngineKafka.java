@@ -539,7 +539,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             Statement statement = connection.createStatement();
-            String sentence = "UPDATE FWQ_BBDD.cadenaMapa SET cadena = " + mapa + " WHERE ID = '1'";
+            String sentence = "UPDATE fwq_bbdd.cadenaMapa SET cadena = '" + mapa + "' WHERE ID = '1'";
 
 			statement.executeUpdate(sentence);
 			statement.close();
