@@ -1,5 +1,8 @@
 import java.net.*;
 import java.io.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import javax.net.ssl.*;
 
 /*
 * Argumentos de llamada: 
@@ -20,7 +23,11 @@ public class FWQ_Registry {
             }
             
             puerto = args[0];
-            ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto));
+            //sslsocket
+            System.setProperty("javax.net.ssl.keyStore", "sd.store");
+            System.setProperty("javax.net.ssl.keyStorePassword", "password");
+            //ServerSocket skServidor = new ServerSocket(Integer.parseInt(puerto));
+            ServerSocket skServidor = ((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(Integer.parseInt(puerto));
             System.out.println("Escucho el puerto: " + puerto);
 
             for (;;){
