@@ -82,6 +82,9 @@ public class FWQ_HiloServidorRegistro extends Thread {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             password = hash(password);
+            //DEBUG
+            System.out.println("Password: " + password);
+            //DEBUG
 
             Statement statement = connection.createStatement();
             String sentence = "INSERT INTO Usuarios VALUES ('" + Alias 
@@ -102,6 +105,9 @@ public class FWQ_HiloServidorRegistro extends Thread {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             password = hash(password);
+            //DEBUG
+            System.out.println("Password: " + password);
+            //DEBUG
 
             Statement statement = connection.createStatement();
             String sentence = "UPDATE Usuarios SET Nombre = '" + nombre + 
@@ -125,6 +131,9 @@ public class FWQ_HiloServidorRegistro extends Thread {
             Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             
             password = hash(password);
+            //DEBUG
+            System.out.println("Password: " + password);
+            //DEBUG
 
             Statement statement = connection.createStatement();
             String sentence = "SELECT Contrasenya FROM Usuarios WHERE Alias = '" + Alias + "'";
