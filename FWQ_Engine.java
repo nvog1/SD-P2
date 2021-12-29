@@ -15,7 +15,7 @@ public class FWQ_Engine {
 	private static String ipWTS;
 	private static Integer puertoWTS;
 	// En atracciones se guarda: ID; posX; posY; tiempoEspera; tiempoCiclo
-	private static volatile String atracciones;
+	//private static volatile String atracciones;
 	
     private static final String CONNECTIONURL = "jdbc:mysql://localhost:3306/FWQ_BBDD?useSSL=false";
     private static final String USER = "root";
@@ -40,7 +40,7 @@ public class FWQ_Engine {
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al leer del socket, " + e.toString());
 		}
       return p_Datos;
 	}
@@ -59,7 +59,7 @@ public class FWQ_Engine {
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al escribir en el socket, " + e.toString());
 		}
 		return;
 	}
@@ -87,12 +87,23 @@ public class FWQ_Engine {
 	public void actualizarAtraccion(String ID, String posX, String posY, String tiempoEspera, String tiempoCiclo) {
 		try {
 			Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
+			PreparedStatement ps = connection.prepareStatement("UPDATE fwq_bbdd.atracciones SET posX=?, posY=?, tiempoEspera=?, tiempoCiclo=? WHERE ID=?");
+			// Rellenar los parametros
+			ps.setString(1, posX);
+			ps.setString(2, posY);
+			ps.setString(3, tiempoEspera);
+			ps.setString(4, tiempoCiclo);
+			ps.setString(5, ID);
+
+			ps.executeUpdate();
+			ps.close();
+			/*Connection connection = DriverManager.getConnection(CONNECTIONURL, USER, PASSWORD);
             Statement statement = connection.createStatement();
             String sentence = "UPDATE fwq_bbdd.atracciones SET posX=" + posX + ", posY=" + posY + 
 				", tiempoEspera=" + tiempoEspera + ", tiempoCiclo=" + tiempoCiclo + 
 				" WHERE ID=" + ID;
 			statement.executeUpdate(sentence);
-			statement.close();
+			statement.close();*/
 		}
 		catch (SQLException e) {
 			System.out.println("Error SQL al actualizar la atraccion " + ID);
@@ -122,7 +133,9 @@ public class FWQ_Engine {
 			String[] datosAtraccion = linea.split(";");
 			// Comprobamos si esta, si no esta se inserta, si esta se actualiza
 			
-			existeAtraccion = consultarAtraccion(datosAtraccion[0]);
+			actualizarAtraccion(datosAtraccion[0], datosAtraccion[1], datosAtraccion[2], datosAtraccion[3], datosAtraccion[4]);
+
+			/*existeAtraccion = consultarAtraccion(datosAtraccion[0]);
 			if (existeAtraccion) {
 				// Se actualiza la atraccion
 				actualizarAtraccion(datosAtraccion[0], datosAtraccion[1], datosAtraccion[2], datosAtraccion[3], datosAtraccion[4]);
@@ -130,7 +143,7 @@ public class FWQ_Engine {
 			else {
 				// Se inserta la atraccion
 				insertarAtraccion(datosAtraccion[0], datosAtraccion[1], datosAtraccion[2], datosAtraccion[3], datosAtraccion[4]);
-			}
+			}*/
 		}
 		System.out.println("Informacion de atracciones procesada");
 	}
@@ -142,18 +155,17 @@ public class FWQ_Engine {
 			try{
 				Socket skCliente = new Socket(FWQ_Engine.ipWTS, FWQ_Engine.puertoWTS);
 				mensaje = leeSocket(skCliente, mensaje);
-				FWQ_Engine.atracciones = mensaje;
+				//FWQ_Engine.atracciones = mensaje;
+				//DEBUG
+				System.out.println(mensaje);
+				//DEBUG
+				// Info de atracciones se guarda en base de datos
+				guardarAtracciones(mensaje);
 			}
 			catch(Exception e){
-				System.out.println("Error: " + e.toString());
+				System.out.println("Error al ejecutar sckRequest, " + e.toString());
 			}
 
-			//DEBUG
-			System.out.println(mensaje);
-			//DEBUG
-
-			// Info de atracciones se guarda en base de datos
-			guardarAtracciones(mensaje);
 		}
 	};
 
@@ -206,7 +218,7 @@ public class FWQ_Engine {
 		}
 		catch(Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error en el main, " + e.toString());
 		}
 
 

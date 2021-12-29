@@ -142,7 +142,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			statement.close();
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error SQL al consultar el numero de usuarios del parque,  " + e.toString());
 		}
 
         return resultado;
@@ -323,7 +323,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			System.out.println("BD actualizada");
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error SQL al actualizar el usuario del mapa de la base de datos, " + e.toString());
 		}
 	}
 
@@ -354,13 +354,12 @@ public class FWQ_HiloEngineKafka extends Thread {
 		// cadena de varias lineas: ID; posX; posY; tiempoEspera; tiempoCiclo
 		atracciones = obtenerAtracciones();
 		String[] lineaAtracciones = atracciones.split("\n");
-		Boolean boolAtraccion = false;
 		// Creacion del mapa
 		for(Integer i = 0; i < 20; i++) {
 			// Para cada Y del eje
 			for (Integer j = 0; j < 20; j++){
 				// Para cada X del eje
-				Boolean atraccionEncontrada = false;
+				Boolean boolAtraccion = false;
 				for (int k = 0; k < lineaAtracciones.length && !boolAtraccion; k++) {
 					// Comprueba si en la posicion xy hay una atraccion
 					String[] datosAtraccion = lineaAtracciones[k].split(";");
@@ -368,7 +367,6 @@ public class FWQ_HiloEngineKafka extends Thread {
 						boolAtraccion = true;
 						// Se añade el tiempo de espera al mapa
 						cadena = cadena + " " + datosAtraccion[3] + " ";
-						atraccionEncontrada = true;
 					}
 				}
 				/*if (j.equals(5) && i.equals(2)) {
@@ -381,7 +379,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 					cadena = cadena + rd.nextInt(79)+1;
 				}
 				else*/
-				if (!atraccionEncontrada) {
+				if (!boolAtraccion) {
 					if (matriz[i][j] != null) {
 						// Implementado para los visitantes
 						Character aux = matriz[i][j].charAt(0);
@@ -444,7 +442,7 @@ public class FWQ_HiloEngineKafka extends Thread {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error SQL al obtener todos los visitantes del mapa, " + e.toString());
 		}
 
 		return resultado;
