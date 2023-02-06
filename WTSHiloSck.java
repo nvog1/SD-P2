@@ -80,7 +80,7 @@ public class WTSHiloSck extends Thread{
 					for(String linea: atracciones){
 						mensaje += linea + "\n";
 					}
-
+					
 					escribeSocket(cs, mensaje);
 					
 				}
